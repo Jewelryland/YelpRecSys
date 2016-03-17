@@ -20,6 +20,10 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 
 	
 ## business
+> Opening Businesses: 66878
+>
+> 
+ 
 	/*
 		if 'open' is False then ignore the business.
 		We have the following 12 states:
@@ -59,6 +63,9 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 	
 
 ## review	
+> May have redundant businesses that has permanently closed.
+> 
+> Simply votes to a total num.
 	
 	{
 	    'type': 'review',
@@ -74,6 +81,21 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 	
 ## user
 	
+> User num: 552339
+> 
+> Each year's elite user num: {2005: 119, 2006: 700, 2007: 1904, 2008: 2921, 2009: 5168, 2010: 8215, 2011: 10232, 2012: 13623, 2013: 14130, 2014: 15416, 2015: 18236}
+> 
+> Total elite users num: 31461
+>
+> Avg elite user's year num of being elite: 2.88
+>
+> Avg compliment num a user receives: 19.996
+>
+> Avg compliment num an elite user receives: 305.638
+>
+> Compliment Types: {'photos', 'writer', 'cool', 'list', 'profile', 'funny', 'plain', 'hot', 'note', 'more', 'cute'}
+> 
+> Votes Num Count: {'useful': 28260265, 'funny': 13701046, 'cool': 15504328}
 	
 	{
 	    'type': 'user',
@@ -81,7 +103,7 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 	    'name': (first name),
 	    'review_count': (review count),
 	    'average_stars': (floating point average, like 4.31),
-	    'votes': {(vote type): (count)},
+	    'votes': {(vote type): (count)}, //"funny", "useful" and "cool" types => regard as equal
 	    'friends': [(friend user_ids)],
 	    'elite': [(years_elite)],
 	    'yelping_since': (date, formatted like '2012-03'),
@@ -93,7 +115,11 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 	}
 	
 ## check-in	
-	
+> Congregate `checkin_info` to a total number,
+>  and merge these info into `TABLE business`;
+> 
+>  without timestamp this info is not very useful.
+
 	{
 	    'type': 'checkin',
 	    'business_id': (encrypted business id),
@@ -116,7 +142,7 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 	    'business_id': (encrypted business id),
 	    'user_id': (encrypted user id),
 	    'date': (date, formatted like '2012-03-14'),
-	    'likes': (count),
+	    'likes': (count), # a cold usage?
 	}
 	
 ## photos (from the photos auxiliary file)
