@@ -1,0 +1,159 @@
+{
+ "name": "flare",
+ "children": [
+  {
+   "name": "analytics",
+   "children": [
+   {
+     "name": "cluster",
+     "children": [
+{"name":"Yusheng/宇一圣","size":15666},
+{"name":"酷宝","size":15585},
+{"name":"Lifetime/良品生活","size":14436},
+{"name":"清水","size":13724},
+{"name":"水宜生","size":13262},
+{"name":"Tupperware/特百惠","size":13237},
+{"name":"LB","size":12335},
+{"name":"BARBIE/芭比","size":11253},
+{"name":"唯漫","size":11097},
+{"name":"山泉","size":10894},
+{"name":"Justcook/嘉士厨","size":10662},
+{"name":"博沃","size":10342},
+{"name":"於晨","size":9318},
+{"name":"先行","size":8790},
+{"name":"SUPER UTENSIL","size":8653},
+{"name":"坚宝","size":8604},
+{"name":"欧佳","size":8316},
+{"name":"qita","size":8006},
+{"name":"珍宝阁","size":7802},
+{"name":"芭蒂熊","size":7556},
+{"name":"子弹头","size":7426}
+     ]
+    },
+    {
+     "name": "optimization",
+     "children": [
+    {"name":"e·dish/壹滴水","size":279987},
+{"name":"沃普","size":270119},
+{"name":"斯格尔","size":244551},
+{"name":"Ermic/易麦","size":235192},
+{"name":"Lock＆Lock/乐扣乐扣","size":227942},
+{"name":"Vanow","size":204109},
+{"name":"邦达","size":199638},
+{"name":"爱暖儿","size":176951},
+{"name":"starbucks/星巴克","size":174584},
+{"name":"opus","size":169117},
+{"name":"oneday","size":158216},
+{"name":"ZOJIRUSHI/象印","size":149063},
+{"name":"喜客多","size":141491},
+{"name":"TIGER/虎牌","size":137189}
+     ]
+    },
+    {
+     "name": "other",
+     "children": [
+     {"name":"Disney/迪士尼","size":1650127},
+{"name":"富光","size":1198493},
+{"name":"THERMOS/膳魔师","size":638252},
+{"name":"海贝丽","size":436440},
+{"name":"天喜","size":394091},
+{"name":"HAERS/哈尔斯","size":364709},
+{"name":"小毛兔","size":362481},
+{"name":"Relea/物生物","size":344897},
+{"name":"Face","size":332861},
+{"name":"nRMEi/恩尔美","size":289095},
+{"name":"古琦","size":120441},
+{"name":"其它品牌","size":115448},
+{"name":"囚爱","size":113863},
+{"name":"HELLO KITTY/凯蒂猫","size":111366},
+{"name":"南极人","size":109597},
+{"name":"卡西菲","size":96843},
+{"name":"Bemega","size":91424}
+     ]
+    },
+    {
+     "name": "other_2",
+     "children": [
+     {"name":"mojito/木吉乇","size":50687},
+{"name":"kucob/硅家宝","size":50332},
+{"name":"HERO","size":50227},
+{"name":"富莱卡","size":49705},
+{"name":"琪虎","size":48821},
+{"name":"TAFUCO/泰福高","size":47735},
+{"name":"光一","size":46435},
+{"name":"ELMUNDO/艾蒙多","size":40759},
+{"name":"南星","size":40319},
+{"name":"膳魔师/THERMOS","size":40068},
+{"name":"欧博","size":35509},
+{"name":"匡迪","size":33610},
+{"name":"HONOR/华象","size":32061},
+{"name":"辉艳","size":30352},
+{"name":"希乐","size":30283},
+{"name":"i Deby/爱得贝","size":29678},
+{"name":"BikuNana","size":27760},
+{"name":"SUPOR/苏泊尔","size":27436},
+{"name":"咔咔","size":27431},
+{"name":"X＆W/艾可思","size":27019},
+{"name":"泽辉","size":26667},
+{"name":"汇众","size":25653},
+{"name":"Fa So La","size":25504},
+{"name":"Kandes/嘉德仕","size":24939},
+{"name":"UP STYLE/悠家良品","size":22924},
+{"name":"万象","size":22393},
+{"name":"迪士尼DISNEY","size":21817},
+{"name":"Lazy Bone/懒骨头","size":21527},
+{"name":"SOLIDWARE/思乐得","size":21235},
+{"name":"MIGO","size":19191},
+{"name":"古居","size":19161},
+{"name":"ZOECHO/佐臣","size":18582},
+{"name":"哈尔斯","size":18035},
+{"name":"嘉百特","size":17920},
+{"name":"竹栖","size":17554},
+{"name":"WEISS/唯水","size":16991},
+{"name":"VOCHIC","size":16676},
+{"name":"金旺","size":15782}
+     ]
+    },
+    {
+     "name": "other_3",
+     "children": [
+     {"name":"绿珠","size":7289},
+{"name":"Meisite","size":6843},
+{"name":"SKYY/深蓝","size":6776},
+{"name":"爵奇","size":6146},
+{"name":"PISEYA/瓶水缘","size":6017},
+{"name":"OWNPOWER/自力","size":5846},
+{"name":"奇发","size":5776},
+{"name":"powcan","size":5774},
+{"name":"KISSON/开心人","size":5537},
+{"name":"WAYA/华亚","size":5444},
+{"name":"Lebete/丽贝德","size":5409},
+{"name":"凯利","size":5335},
+{"name":"Ymer","size":5085}
+     ]
+    },
+    {
+     "name": "graph",
+     "children": [{"name":"七克拉","size":86652},
+{"name":"缪缪","size":84290},
+{"name":"华川","size":84057},
+{"name":"Gladore/格莱达","size":83618},
+{"name":"BAN’S/百安思","size":82294},
+{"name":"卡西诺","size":79133},
+{"name":"Tomic/特美刻","size":74848},
+{"name":"Hello Kitty","size":74766},
+{"name":"Miffy/米菲","size":71810},
+{"name":"凡一","size":66243},
+{"name":"铂盛","size":63782},
+{"name":"JUST LIFE/生活派","size":62361},
+{"name":"永一","size":61526},
+{"name":"艾尚丽","size":56500},
+{"name":"HEENOOR/希诺","size":55372},
+{"name":"涌泉","size":53090}
+      
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "销售量",
+  "children": [
+    {
+      "name": "0-20岁",
+      "children":[
+	  {"name": "第一天", "size": 23},
+      {"name": "第二天", "size": 35},
+      {"name": "第三天", "size": 56},
+      {"name": "第四天", "size": 57},
+	  {"name": "第五天", "size": 89},
+	  {"name": "第六天", "size": 92},
+	  {"name": "第七天", "size": 109}
+		    ]
+           }
+		  
+		 ,
+    {
+      "name": "20-40岁",
+      "children": [
+        
+	  {"name": "第一天", "size": 57},
+      {"name": "第二天", "size": 89},
+      {"name": "第三天", "size": 121},
+      {"name": "第四天", "size": 145},
+	  {"name": "第五天", "size": 167},
+	  {"name": "第六天", "size": 198},
+	  {"name": "第七天", "size": 220}
+		    ]
+		  
+		 },
+	 {
+      "name": "40-60岁",
+      "children": [
+        
+	  {"name": "第一天", "size": 25},
+      {"name": "第二天", "size": 35},
+      {"name": "第三天", "size": 45},
+      {"name": "第四天", "size": 76},
+	  {"name": "第五天", "size": 81},
+	  {"name": "第六天", "size": 94},
+	  {"name": "第七天", "size": 102}
+		    ]
+  
+		 }
+	  ]
+	 }
+		 
+        

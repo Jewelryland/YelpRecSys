@@ -1,0 +1,106 @@
+{
+  "name": "销售量",
+  "children": [
+    {
+      "name": "0-20岁",
+      "children": [
+        {
+          "name": "第一天",
+          "children": [23]
+        },
+        {
+          "name": "第二天",
+          "children":[
+            {
+              "name": "第三天",
+              "children": [56]
+            },
+            {
+              "name": "第四天",
+              "children": [57]
+            },
+            {
+              "name": "第五天",
+              "children": [89]
+            },
+            {
+              "name": "第六天",
+              "children": [92]
+            },
+            {
+              "name": "第七天",
+              "children": [109]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "20-40岁",
+      "children": [
+        {
+          "name": "第一天",
+          "children": [57]
+        },
+        {
+          "name": "第二天",
+          "children": [89]
+        },
+        {
+          "name": "第三天",
+          "children": [121]
+        },
+        {
+          "name": "第四天",
+          "children": [145]
+        },
+        {
+          "name": "第五天",
+          "children": [167]
+        },
+        {
+          "name": "第六天",
+          "children": [198]
+        },
+        {
+          "name": "第七天",
+          "children": [220]
+        }
+      ]
+    },
+    {
+      "name": "40-60岁",
+      "children": [
+        {
+          "name": "第一天",
+          "children": [25]
+        },
+		{
+          "name": "第二天",
+          "children": [35]
+        },
+		{
+          "name": "第三天",
+          "children": [45]
+        },
+		{
+          "name": "第四天",
+          "children": [76]
+        },
+		{
+          "name": "第五天",
+          "children": [81]
+        },
+		{
+          "name": "第六天",
+          "children": [94]
+        },
+		{
+          "name": "第七天",
+          "children": [102]
+        }
+		
+      ]
+    }
+  ]
+}
