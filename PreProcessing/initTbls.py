@@ -8,6 +8,7 @@ import time
 
 __DATA_PATH__ = '/Users/Adward/OneDrive/YelpData/'
 __DB_PATH__ = os.path.join(__DATA_PATH__, 'yelp.sqlite')
+VALID_STATES = ['AZ', 'NV', 'ON', 'WI', 'QC', 'SC', 'EDH', 'PA', 'MLN', 'BW', 'NC', "IL"]
 
 def init_business(): # & checkin
     busiDataPath = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_business.json')
@@ -31,11 +32,13 @@ def init_business(): # & checkin
                             weekends_open INT,
                             checkins INT
                             )''') # intrinsic commit
+                    cur.execute('DROP TABLE IF EXISTS closed_business')
+                    cur.execute('CREATE TABLE closed_business (business_id TEXT PRIMARY KEY NOT NULL)')
                     conn.commit()
                     try:
                         while True:
                             busi = json.loads(f.readline())
-                            if busi['open']:
+                            if busi['open'] and (busi['state'] in VALID_STATES):
                                 hours = busi['hours']
                                 weekends = 0
                                 if ('Saturday' in hours) or ('Saturday' in hours):
@@ -52,7 +55,11 @@ def init_business(): # & checkin
                                             0)
                                 cur.execute('INSERT INTO business VALUES (?,?,?,?,?,?,?,?,?,?)', insTuple)
                                 conn.commit()
+                            else:
+                                cur.execute('INSERT INTO closed_business VALUES (?)', (busi['business_id'],)) # ',' in the tail is indispensable
+                                conn.commit()
                     except:
+                        #print(sys.exc_info())
                         pass #encountered EOF of business
             except:
                 print('Cannot find business data file')
@@ -200,8 +207,10 @@ def business_stat():
     states = {}
     attrs = set()
     mostNbrhs = 1
+    mostCategories = 1
     path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_business.json')
     openBusiNum = 0
+    categories = {}
     with open(path, mode='r', encoding='utf-8') as f:
         try:
             while True:
@@ -216,11 +225,17 @@ def business_stat():
                     for attr in busi['attributes']:
                         attrs.add(attr)
                     mostNbrhs = max(len(busi['neighborhoods']), mostNbrhs)
+                    mostCategories = max(len(busi['categories']), mostCategories)
+                    for ca in busi['categories']:
+                        if ca in categories:
+                            categories[ca] += 1
+                        else:
+                            categories[ca] = 1
         except:
             pass
     lessThanHundred = 0
     for st in states:
-        if states[st] >= 100:
+        if states[st] >= 18:
             print(st, states[st])
         else:
             lessThanHundred += 1
@@ -228,10 +243,16 @@ def business_stat():
     print(mostNbrhs)
     print(attrs)
     print("Opening Businesses:", openBusiNum)
+    print("Most Categories:", mostCategories)
+    print("Categories Num. :", len(list(categories.keys())))
+    catlist = [(key, categories[key]) for key in categories]
+    catlist.sort(key=lambda x: x[1], reverse=True)
+    print(catlist[100])
 
 def user_stat():
     t = time.time()
     path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_user.json')
+    yelpingSince = {}
     eliteYears = {}
     eliteUsersNum, eliteUsersTotalYears, complimentNum, eliteCompNum = [0] * 4
     complimentTypes = set()
@@ -244,11 +265,13 @@ def user_stat():
                 usr = json.loads(f.readline())
                 for key in usr['votes']:
                     votesNum[key] += usr['votes'][key]
+                ##
                 tmpCompNum = 0
                 for comp in usr['compliments']:
                     complimentTypes.add(comp)
                     tmpCompNum += usr['compliments'][comp]
                 complimentNum += tmpCompNum
+                ##
                 if len(usr['elite']):
                     for y in usr['elite']:
                         if y in eliteYears:
@@ -258,10 +281,18 @@ def user_stat():
                     eliteUsersNum += 1
                     eliteUsersTotalYears += len(usr['elite'])
                     eliteCompNum += tmpCompNum
+                ##
+                sincey = int(usr['yelping_since'].split('-')[0])
+                if sincey in yelpingSince:
+                    yelpingSince[sincey] += 1
+                else:
+                    yelpingSince[sincey] = 1
+                ##
                 lineN += 1
         except:
             pass
         print("User num:", lineN)
+        print("Each year's registration:", yelpingSince)
         print("Each year's elite user num:", eliteYears)
         print("Total elite users num:", eliteUsersNum)
         print("Avg elite user's year num of being elite:", eliteUsersTotalYears/eliteUsersNum)
@@ -269,7 +300,10 @@ def user_stat():
         print("Avg compliment num an elite user receives:", eliteCompNum/eliteUsersNum)
         print("Compliment Types:", complimentTypes)
         print("Votes Num Count:", votesNum)
+        print('\n')
+
     print("Took", time.time()-t, "s to execute", "user_stat()")
+
 
 def review_stat():
     t = time.time()
@@ -289,8 +323,8 @@ def review_stat():
 def tip_stat():
     path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_tip.json')
     with open(path, mode='r', encoding='utf-8') as f:
-        tipN, tipLengSum, maxLeng = [0] * 3
-        minLeng = 1000
+        tipN, tipLengSum, maxLeng, likesSum, likesCnt, maxLikes = [0] * 6
+        minLeng, minLikes = [1000] * 2
         try:
             while True:
                 tip = json.loads(f.readline())
@@ -298,6 +332,11 @@ def tip_stat():
                 maxLeng = max(maxLeng, tipLeng)
                 minLeng = min(minLeng, tipLeng)
                 tipLengSum += tipLeng
+                if tip['likes']:
+                    likesSum += tip['likes']
+                    likesCnt += 1
+                    maxLikes = max(maxLikes, tip['likes'])
+                    minLikes = min(minLikes, tip['likes'])
                 tipN += 1
         except:
             pass
@@ -305,9 +344,23 @@ def tip_stat():
         print("Max tip length:", maxLeng)
         print("Min tip length:", minLeng)
         print("Avg tip length:", tipLengSum / tipN)
+        print("Total liked tips:", likesCnt)
+        print("Total liked times:", likesSum)
+        print(100*likesCnt/tipN, "% of tips liked")
+        print("Avg tip liked times:", likesSum/tipN)
+
+def cleaning(): #still left out those user statistics including closed businesses
+    try:
+        with sqlite3.connect(__DB_PATH__) as conn:
+            cur = conn.cursor()
+            cur.execute('DELETE FROM review WHERE business_id IN (SELECT business_id FROM closed_business)')
+            # DELETE FROM review WHERE EXISTS (SELECT * FROM closed_business WHERE closed_business.business_id=review.business_id)
+    except:
+        print('Cannot be connected to database QAQ')
 
 if __name__ == '__main__':
     funcDict = {'b': init_business, 'u': init_user, 'r': init_review, 't': init_tip,
-                'bstat': business_stat, 'ustat': user_stat, 'rstat': review_stat, 'tstat': tip_stat}
+                'bstat': business_stat, 'ustat': user_stat, 'rstat': review_stat, 'tstat': tip_stat,
+                'clean': cleaning}
     for arg in sys.argv[1:]:
         funcDict[arg]()
