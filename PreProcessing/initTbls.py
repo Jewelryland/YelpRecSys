@@ -9,7 +9,9 @@ import time
 __DATA_PATH__ = '/Users/Adward/OneDrive/YelpData/'
 __DB_PATH__ = os.path.join(__DATA_PATH__, 'yelp.sqlite')
 VALID_STATES = ['AZ', 'NV', 'ON', 'WI', 'QC', 'SC', 'EDH', 'PA', 'MLN', 'BW', 'NC', "IL"]
-
+TOTAL_NUM = {'b': {'open': 66878, 'all': 77445},
+             'u': {'elite': 31461, 'all': 552339},
+             'r': 2225213}
 
 def init_business(): # & checkin
     busiDataPath = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_business.json')
@@ -37,6 +39,7 @@ def init_business(): # & checkin
                     cur.execute('CREATE TABLE closed_business (business_id TEXT PRIMARY KEY NOT NULL)')
                     conn.commit()
                     try:
+                        row_num = 0
                         while True:
                             busi = json.loads(f.readline())
                             if True:  # busi['open'] and (busi['state'] in VALID_STATES):
@@ -59,6 +62,9 @@ def init_business(): # & checkin
                             if not busi['open']:
                                 cur.execute('INSERT INTO closed_business VALUES (?)', (busi['business_id'],)) # ',' in the tail is indispensable
                                 conn.commit()
+                            row_num += 1
+                            if row_num % 100 == 0:
+                                print("%.2f %%" % (row_num * 100 / TOTAL_NUM['b']['all']))
                     except:
                         # print(sys.exc_info())
                         pass  # encountered EOF of business
@@ -93,11 +99,11 @@ def init_user():
                             (
                             user_id TEXT PRIMARY KEY NOT NULL,
                             user_name TEXT,
-                            review_count TEXT,
+                            review_count INT,
                             average_stars REAL,
                             votes INT,
                             elite TEXT,
-                            yelping_since TEXT,
+                            yelping_since INT,
                             compliments INT,
                             fans INT
                             )''') # intrinsic commit
@@ -109,6 +115,7 @@ def init_user():
                             )''')
                     conn.commit()
                     try:
+                        row_num = 0
                         while True:
                             usr = json.loads(f.readline())
                             insTuple = (usr['user_id'],
@@ -117,7 +124,7 @@ def init_user():
                                         usr['average_stars'],
                                         sum(usr['votes'].values()),
                                         '&'.join([str(y) for y in usr['elite']]),
-                                        usr['yelping_since'],
+                                        int(''.join(usr['yelping_since'].split('-'))),
                                         sum(usr['compliments'].values()),
                                         usr['fans']
                                         )
@@ -125,6 +132,9 @@ def init_user():
                             for friend in usr['friends']:
                                 cur.execute('INSERT INTO friendship VALUES (?,?)', (usr['user_id'], friend))
                             conn.commit()
+                            row_num += 1
+                            if row_num % 100 == 0:
+                                print("%.2f %%" % (row_num * 100 / TOTAL_NUM['u']['all']))
                     except:
                         pass  # encountered EOF
             except:
@@ -147,11 +157,12 @@ def init_review():
                             business_id TEXT NOT NULL,
                             user_id TEXT NOT NULL,
                             stars INT,
-                            review_date TEXT,
+                            review_date INT,
                             votes INT
                             )''')
                     conn.commit()
                     try:
+                        row_num = 0
                         while True:
                             revw = json.loads(f.readline())
                             insTuple = (
@@ -159,11 +170,14 @@ def init_review():
                                 revw['business_id'],
                                 revw['user_id'],
                                 revw['stars'],
-                                revw['date'],
+                                int(''.join(revw['date'].split('-'))),
                                 sum(revw['votes'].values())
                             )
                             cur.execute('INSERT INTO review VALUES (?,?,?,?,?,?)', insTuple)
                             conn.commit()
+                            row_num += 1
+                            if row_num % 1000 == 0:
+                                print("%.2f %%" % (row_num * 100 / TOTAL_NUM['r']))
                     except:
                         pass  # encountered EOF of review
             except:
@@ -214,11 +228,13 @@ def business_stat():
     mostCategories = 1
     path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_business.json')
     openBusiNum = 0
+    totalBusiNum = 0
     categories = {}
     with open(path, mode='r', encoding='utf-8') as f:
         try:
             while True:
                 busi = json.loads(f.readline())
+                totalBusiNum += 1
                 if busi['open']:
                     openBusiNum += 1
                     if busi['state'] not in states:
@@ -246,6 +262,7 @@ def business_stat():
     print("<100", lessThanHundred)
     print(mostNbrhs)
     print(attrs)
+    print("Total Businesses:", totalBusiNum)
     print("Opening Businesses:", openBusiNum)
     print("Most Categories:", mostCategories)
     print("Categories Num. :", len(list(categories.keys())))
