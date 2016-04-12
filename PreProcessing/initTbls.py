@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-#import pymysql
+# import pymysql
 import sqlite3
 import json
 import time
@@ -9,6 +9,7 @@ import time
 __DATA_PATH__ = '/Users/Adward/OneDrive/YelpData/'
 __DB_PATH__ = os.path.join(__DATA_PATH__, 'yelp.sqlite')
 VALID_STATES = ['AZ', 'NV', 'ON', 'WI', 'QC', 'SC', 'EDH', 'PA', 'MLN', 'BW', 'NC', "IL"]
+
 
 def init_business(): # & checkin
     busiDataPath = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_business.json')
@@ -31,14 +32,14 @@ def init_business(): # & checkin
                             categories TEXT,
                             weekends_open INT,
                             checkins INT
-                            )''') # intrinsic commit
+                            )''')  # intrinsic commit
                     cur.execute('DROP TABLE IF EXISTS closed_business')
                     cur.execute('CREATE TABLE closed_business (business_id TEXT PRIMARY KEY NOT NULL)')
                     conn.commit()
                     try:
                         while True:
                             busi = json.loads(f.readline())
-                            if busi['open'] and (busi['state'] in VALID_STATES):
+                            if True:  # busi['open'] and (busi['state'] in VALID_STATES):
                                 hours = busi['hours']
                                 weekends = 0
                                 if ('Saturday' in hours) or ('Saturday' in hours):
@@ -55,12 +56,12 @@ def init_business(): # & checkin
                                             0)
                                 cur.execute('INSERT INTO business VALUES (?,?,?,?,?,?,?,?,?,?)', insTuple)
                                 conn.commit()
-                            else:
+                            if not busi['open']:
                                 cur.execute('INSERT INTO closed_business VALUES (?)', (busi['business_id'],)) # ',' in the tail is indispensable
                                 conn.commit()
                     except:
-                        #print(sys.exc_info())
-                        pass #encountered EOF of business
+                        # print(sys.exc_info())
+                        pass  # encountered EOF of business
             except:
                 print('Cannot find business data file')
 
@@ -73,7 +74,7 @@ def init_business(): # & checkin
                                         (sum(ckin['checkin_info'].values()), ckin['business_id']))
                             conn.commit()
                     except:
-                        pass #encountered EOF of checkin
+                        pass  #encountered EOF of checkin
             except:
                 print('Cannot find checkin data file')
     except:
@@ -125,11 +126,12 @@ def init_user():
                                 cur.execute('INSERT INTO friendship VALUES (?,?)', (usr['user_id'], friend))
                             conn.commit()
                     except:
-                        pass #encountered EOF
+                        pass  # encountered EOF
             except:
                 print('Cannot be connected to database QAQ')
     except:
         print('Cannot find data file')
+
 
 def init_review():
     revwDataPath = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_review.json')
@@ -163,11 +165,12 @@ def init_review():
                             cur.execute('INSERT INTO review VALUES (?,?,?,?,?,?)', insTuple)
                             conn.commit()
                     except:
-                        pass #encountered EOF of review
+                        pass  # encountered EOF of review
             except:
                 print('Cannot find review data file')
     except:
         print('Cannot be connected to database QAQ')
+
 
 def init_tip():
     tipDataPath = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_tip.json')
@@ -197,11 +200,12 @@ def init_tip():
                             cur.execute('INSERT INTO tip VALUES (?,?,?,?)', insTuple)
                             conn.commit()
                     except:
-                        pass #encountered EOF of tip
+                        pass  # encountered EOF of tip
             except:
                 print('Cannot find review data file')
     except:
         print('Cannot be connected to database QAQ')
+
 
 def business_stat():
     states = {}
@@ -248,6 +252,7 @@ def business_stat():
     catlist = [(key, categories[key]) for key in categories]
     catlist.sort(key=lambda x: x[1], reverse=True)
     print(catlist[100])
+
 
 def user_stat():
     t = time.time()
@@ -320,6 +325,7 @@ def review_stat():
         print(lineN)
     print("Took", time.time()-t, "s to execute", "review_stat()")
 
+
 def tip_stat():
     path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_tip.json')
     with open(path, mode='r', encoding='utf-8') as f:
@@ -349,12 +355,14 @@ def tip_stat():
         print(100*likesCnt/tipN, "% of tips liked")
         print("Avg tip liked times:", likesSum/tipN)
 
-def cleaning(): #still left out those user statistics including closed businesses
+
+def cleaning():  # still left out those user statistics including closed businesses
     try:
         with sqlite3.connect(__DB_PATH__) as conn:
             cur = conn.cursor()
             cur.execute('DELETE FROM review WHERE business_id IN (SELECT business_id FROM closed_business)')
-            # DELETE FROM review WHERE EXISTS (SELECT * FROM closed_business WHERE closed_business.business_id=review.business_id)
+            #  DELETE FROM review WHERE EXISTS
+            #  (SELECT * FROM closed_business WHERE closed_business.business_id=review.business_id)
     except:
         print('Cannot be connected to database QAQ')
 
