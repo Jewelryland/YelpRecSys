@@ -369,23 +369,52 @@ def tip_stat():
         print("Avg tip length:", tipLengSum / tipN)
         print("Total liked tips:", likesCnt)
         print("Total liked times:", likesSum)
-        print(100*likesCnt/tipN, "% of tips liked")
-        print("Avg tip liked times:", likesSum/tipN)
+        print(100 * likesCnt / tipN, "% of tips liked")
+        print("Avg tip liked times:", likesSum / tipN)
 
 
 def cleaning():  # still left out those user statistics including closed businesses
-    try:
-        with sqlite3.connect(__DB_PATH__) as conn:
-            cur = conn.cursor()
-            cur.execute('DELETE FROM review WHERE business_id IN (SELECT business_id FROM closed_business)')
-            #  DELETE FROM review WHERE EXISTS
-            #  (SELECT * FROM closed_business WHERE closed_business.business_id=review.business_id)
-    except:
-        print('Cannot be connected to database QAQ')
+    with sqlite3.connect(__DB_PATH__) as conn:
+        # cur.execute('DELETE FROM review WHERE business_id IN (SELECT business_id FROM closed_business)')
+        #  DELETE FROM review WHERE EXISTS
+        #  (SELECT * FROM closed_business WHERE closed_business.business_id=review.business_id)
+        cur = conn.execute('SELECT yelping_since, review_date, user_id, review_count '
+                           'FROM (review JOIN user USING (user_id))')
+        abnormal_usrs = {}
+        for row in cur:
+            if row[0] * 100 + 1 > row[1]:
+                if row[2] in abnormal_usrs:
+                    abnormal_usrs[row[2]][0] += 1
+                else:
+                    abnormal_usrs[row[2]] = [1, row[3]]
+        for usr in abnormal_usrs:
+            print(abnormal_usrs[usr])
+
+
+def add_user_state():
+    with sqlite3.connect(__DB_PATH__) as conn:
+        conn.execute('DROP TABLE IF EXISTS user_reside')
+        conn.execute('CREATE TABLE user_reside (user_id TEXT PRIMARY KEY, user_state TEXT)')
+        cur = conn.execute('INSERT INTO user_reside (user_id, user_state) SELECT user_id, state AS user_state FROM ('
+                           'SELECT user_id, state, MAX(cnt) FROM'
+                           '(SELECT user_id, state, COUNT(*) AS cnt FROM '
+                           '((review JOIN user USING (user_id)) JOIN business USING (business_id))'
+                           'GROUP BY user_id, state) GROUP BY user_id)')
+        conn.commit()
+        '''
+        for row in cur:
+            uid, state, maxcnt = row
+            if state not in VALID_STATES:
+                state = 'OTH'
+            print(uid, state)
+            cur.execute('INSERT INTO user_reside VALUES (?,?)', ('eqweqwewq', 'AZ'))
+            conn.commit()
+        '''
+
 
 if __name__ == '__main__':
     funcDict = {'b': init_business, 'u': init_user, 'r': init_review, 't': init_tip,
                 'bstat': business_stat, 'ustat': user_stat, 'rstat': review_stat, 'tstat': tip_stat,
-                'clean': cleaning}
+                'clean': cleaning, 'reside': add_user_state}
     for arg in sys.argv[1:]:
         funcDict[arg]()
