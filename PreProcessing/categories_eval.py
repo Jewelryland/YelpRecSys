@@ -42,7 +42,7 @@ n_sample = 2225213  # 1992542
 # sqlite3.register_adapter(Flist, adapt_flist)
 # sqlite3.register_converter("FLIST", convert_flist)
 
-def b_category_pca(n_components = 10):
+def b_category_pca(n_components=3):
     t = time()
     def categories_to_vectors(conn, cmd, vecs, ca_set):
         cur = conn.execute(cmd)
@@ -88,4 +88,4 @@ def b_category_pca(n_components = 10):
 
 
 if __name__ == '__main__':
-    b_category_pca()
+    b_category_pca(int(sys.argv[1]))
