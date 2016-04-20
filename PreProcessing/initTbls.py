@@ -13,6 +13,7 @@ TOTAL_NUM = {'b': {'open': 66878, 'all': 77445},
              'u': {'elite': 31461, 'all': 552339},
              'r': 2225213}
 
+
 def init_business(): # & checkin
     busiDataPath = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_business.json')
     ckinDataPath = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_checkin.json')
@@ -221,158 +222,6 @@ def init_tip():
         print('Cannot be connected to database QAQ')
 
 
-def business_stat():
-    states = {}
-    attrs = set()
-    mostNbrhs = 1
-    mostCategories = 1
-    path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_business.json')
-    openBusiNum = 0
-    totalBusiNum = 0
-    categories = {}
-    with open(path, mode='r', encoding='utf-8') as f:
-        try:
-            while True:
-                busi = json.loads(f.readline())
-                totalBusiNum += 1
-                if busi['open']:
-                    openBusiNum += 1
-                    if busi['state'] not in states:
-                        states[busi['state']] = 1
-                    else:
-                        states[busi['state']] += 1
-                    ##
-                    for attr in busi['attributes']:
-                        attrs.add(attr)
-                    mostNbrhs = max(len(busi['neighborhoods']), mostNbrhs)
-                    mostCategories = max(len(busi['categories']), mostCategories)
-                    for ca in busi['categories']:
-                        if ca in categories:
-                            categories[ca] += 1
-                        else:
-                            categories[ca] = 1
-        except:
-            pass
-    lessThanHundred = 0
-    for st in states:
-        if states[st] >= 18:
-            print(st, states[st])
-        else:
-            lessThanHundred += 1
-    print("<100", lessThanHundred)
-    print(mostNbrhs)
-    print(attrs)
-    print("Total Businesses:", totalBusiNum)
-    print("Opening Businesses:", openBusiNum)
-    print("Most Categories:", mostCategories)
-    print("Categories Num. :", len(list(categories.keys())))
-    catlist = [(key, categories[key]) for key in categories]
-    catlist.sort(key=lambda x: x[1], reverse=True)
-    print(catlist[100])
-
-
-def user_stat():
-    t = time.time()
-    path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_user.json')
-    yelpingSince = {}
-    eliteYears = {}
-    eliteUsersNum, eliteUsersTotalYears, complimentNum, eliteCompNum = [0] * 4
-    complimentTypes = set()
-    votesNum = {'funny': 0, 'cool': 0, 'useful': 0}
-
-    with open(path, mode='r', encoding='utf-8') as f:
-        lineN = 0
-        try:
-            while True:
-                usr = json.loads(f.readline())
-                for key in usr['votes']:
-                    votesNum[key] += usr['votes'][key]
-                ##
-                tmpCompNum = 0
-                for comp in usr['compliments']:
-                    complimentTypes.add(comp)
-                    tmpCompNum += usr['compliments'][comp]
-                complimentNum += tmpCompNum
-                ##
-                if len(usr['elite']):
-                    for y in usr['elite']:
-                        if y in eliteYears:
-                            eliteYears[y] += 1
-                        else:
-                            eliteYears[y] = 1
-                    eliteUsersNum += 1
-                    eliteUsersTotalYears += len(usr['elite'])
-                    eliteCompNum += tmpCompNum
-                ##
-                sincey = int(usr['yelping_since'].split('-')[0])
-                if sincey in yelpingSince:
-                    yelpingSince[sincey] += 1
-                else:
-                    yelpingSince[sincey] = 1
-                ##
-                lineN += 1
-        except:
-            pass
-        print("User num:", lineN)
-        print("Each year's registration:", yelpingSince)
-        print("Each year's elite user num:", eliteYears)
-        print("Total elite users num:", eliteUsersNum)
-        print("Avg elite user's year num of being elite:", eliteUsersTotalYears/eliteUsersNum)
-        print("Avg compliment num a user receives:", complimentNum/lineN)
-        print("Avg compliment num an elite user receives:", eliteCompNum/eliteUsersNum)
-        print("Compliment Types:", complimentTypes)
-        print("Votes Num Count:", votesNum)
-        print('\n')
-
-    print("Took", time.time()-t, "s to execute", "user_stat()")
-
-
-def review_stat():
-    t = time.time()
-    path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_review.json')
-    with open(path, mode='r', encoding='utf-8') as f:
-        lineN = 0
-        try:
-            while True:
-                #revw = json.loads(f.readline())
-                print(f.readline()[-5])
-                lineN += 1
-        except:
-            pass
-        print(lineN)
-    print("Took", time.time()-t, "s to execute", "review_stat()")
-
-
-def tip_stat():
-    path = os.path.join(__DATA_PATH__, 'yelp_academic_dataset_tip.json')
-    with open(path, mode='r', encoding='utf-8') as f:
-        tipN, tipLengSum, maxLeng, likesSum, likesCnt, maxLikes = [0] * 6
-        minLeng, minLikes = [1000] * 2
-        try:
-            while True:
-                tip = json.loads(f.readline())
-                tipLeng = len(tip['text'])
-                maxLeng = max(maxLeng, tipLeng)
-                minLeng = min(minLeng, tipLeng)
-                tipLengSum += tipLeng
-                if tip['likes']:
-                    likesSum += tip['likes']
-                    likesCnt += 1
-                    maxLikes = max(maxLikes, tip['likes'])
-                    minLikes = min(minLikes, tip['likes'])
-                tipN += 1
-        except:
-            pass
-        print("Total tips:", tipN)
-        print("Max tip length:", maxLeng)
-        print("Min tip length:", minLeng)
-        print("Avg tip length:", tipLengSum / tipN)
-        print("Total liked tips:", likesCnt)
-        print("Total liked times:", likesSum)
-        print(100 * likesCnt / tipN, "% of tips liked")
-        print("Avg tip liked times:", likesSum / tipN)
-
-
 def cleaning():  # still left out those user statistics including closed businesses
     with sqlite3.connect(__DB_PATH__) as conn:
         # cur.execute('DELETE FROM review WHERE business_id IN (SELECT business_id FROM closed_business)')
@@ -401,20 +250,74 @@ def add_user_state():
                            '((review JOIN user USING (user_id)) JOIN business USING (business_id))'
                            'GROUP BY user_id, state) GROUP BY user_id)')
         conn.commit()
-        '''
-        for row in cur:
-            uid, state, maxcnt = row
-            if state not in VALID_STATES:
-                state = 'OTH'
-            print(uid, state)
-            cur.execute('INSERT INTO user_reside VALUES (?,?)', ('eqweqwewq', 'AZ'))
-            conn.commit()
-        '''
+
+        # for row in cur:
+        #     uid, state, maxcnt = row
+        #     if state not in VALID_STATES:
+        #         state = 'OTH'
+        #     print(uid, state)
+        #     cur.execute('INSERT INTO user_reside VALUES (?,?)', ('eqweqwewq', 'AZ'))
+        #     conn.commit()
+
+
+def add_user_friends_stat():
+    with sqlite3.connect(__DB_PATH__) as conn:
+        conn.execute('DROP TABLE IF EXISTS friends_stat')
+        conn.execute('''CREATE TABLE friends_stat (
+                            user_id TEXT PRIMARY KEY,
+                            avg_votes INT,
+                            avg_review_count INT
+                            )''')
+        cur = conn.execute('INSERT INTO friends_stat (user_id, avg_votes, avg_review_count) '
+                           'SELECT user1_id AS user_id, AVG(votes), AVG(review_count) '
+                           'FROM (SELECT user1_id, votes, review_count FROM '
+                           '((SELECT user1_id, user2_id AS user_id FROM friendship) NATURAL JOIN user) ) '
+                           'GROUP BY user1_id')
+        conn.commit()
+
+
+def add_business_star_stat_by_elite():
+    with sqlite3.connect(__DB_PATH__) as conn:
+        conn.execute('CREATE TEMP TABLE tmp1 (business_id TEXT, avg_star_elite REAL)')
+        conn.execute('CREATE TEMP TABLE tmp2 (business_id TEXT, avg_star_nonelite REAL)')
+        conn.execute('INSERT INTO tmp1 (business_id, avg_star_elite) '
+                     'SELECT business_id, AVG(average_stars) AS avg_star_elite FROM '
+                     '(review JOIN user USING (user_id)) WHERE elite!="" GROUP BY business_id')
+        conn.execute('INSERT INTO tmp2 (business_id, avg_star_nonelite) '
+                     'SELECT business_id, AVG(average_stars) AS avg_star_nonelite FROM '
+                     '(review JOIN user USING (user_id)) WHERE elite="" GROUP BY business_id')
+        conn.execute('DROP TABLE IF EXISTS bstat_by_elite')
+        conn.execute('CREATE TABLE bstat_by_elite (business_id TEXT, avg_star_elite REAL, avg_star_nonelite REAL)')
+        conn.execute('INSERT INTO bstat_by_elite SELECT * FROM (tmp1 LEFT OUTER JOIN tmp2 USING (business_id))')
+
+
+def add_friends_star_stat():
+    with sqlite3.connect(__DB_PATH__) as conn:
+        conn.execute('DROP TABLE IF EXISTS friends_star_stat')
+        conn.execute('CREATE TABLE friends_star_stat (user_id, business_id, avg_friends_star)')
+        conn.execute('''INSERT INTO friends_star_stat SELECT user1_id AS user_id, business_id, AVG(stars) AS avg_friends_star
+                        FROM (
+                          (friendship
+                            JOIN
+                            (SELECT user_id AS user1_id, business_id FROM review)
+                            USING (user1_id)
+                          )
+                          JOIN
+                          (SELECT user_id AS user2_id, business_id FROM review)
+                          USING (user2_id)
+                        )
+                        GROUP BY user1_id, business_id''')
+
+
+def add_user_taste():
+    with sqlite3.connect(__DB_PATH__) as conn:
+        conn.execute('DROP TABLE IF EXISTS user_taste')
+        conn.execute('CREATE TABLE user_taste (user_id, )')
 
 
 if __name__ == '__main__':
     funcDict = {'b': init_business, 'u': init_user, 'r': init_review, 't': init_tip,
-                'bstat': business_stat, 'ustat': user_stat, 'rstat': review_stat, 'tstat': tip_stat,
-                'clean': cleaning, 'reside': add_user_state}
+                'clean': cleaning, 'reside': add_user_state, 'friends_stat': add_user_friends_stat,
+                'b_elite': add_business_star_stat_by_elite, 'f_star_stat': add_friends_star_stat}
     for arg in sys.argv[1:]:
         funcDict[arg]()
