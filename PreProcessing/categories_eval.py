@@ -2,7 +2,6 @@
 __author__ = 'Adward'
 
 # Python utils imports
-import math
 import os
 import sys
 from time import time
@@ -14,11 +13,6 @@ import numpy as np
 
 # Import classifiers and performance metrics
 from sklearn.preprocessing import *
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.cross_validation import StratifiedKFold, ShuffleSplit
-from sklearn.metrics import *
-from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.decomposition import PCA
 
 # Constant values
@@ -43,7 +37,9 @@ n_sample = 2225213  # 1992542
 # sqlite3.register_converter("FLIST", convert_flist)
 
 def b_category_pca(n_components=3):
+    max_dims = 30
     t = time()
+
     def categories_to_vectors(conn, cmd, vecs, ca_set):
         cur = conn.execute(cmd)
         for row in cur:
@@ -73,9 +69,15 @@ def b_category_pca(n_components=3):
         categories_to_vectors(conn, CMD1, pca_model, ca_set)
         cur = conn.execute('SELECT business_id FROM business')
         bid_lst = cur.fetchall()
-        pca = PCA(n_components=n_components)
-        pca_model = pca.fit_transform(np.array(pca_model))
-        pca_model = [(bid_lst[i][0], ';'.join(map(str, pca_model[i])),) for i in range(len(pca_model))]
+        if n_components:
+            pca = PCA(n_components=n_components)
+            pca_model = pca.fit_transform(np.array(pca_model))
+            pca_model = [(bid_lst[i][0], ';'.join(map(str, pca_model[i])),) for i in range(len(pca_model))]
+        else:
+            pca = PCA(n_components='mle')
+            pca_model = pca.fit_transform(np.array(pca_model))
+            pca_model = [(bid_lst[i][0], ';'.join(map(str, pca_model[i][0:max_dims])),) for i in range(len(pca_model))]
+
         print('Finishing fitting the PCA model, using', time()-t, 's')
         # print(pca.explained_variance_ratio_)
         t = time()
@@ -88,4 +90,7 @@ def b_category_pca(n_components=3):
 
 
 if __name__ == '__main__':
-    b_category_pca(int(sys.argv[1]))
+    try:
+        b_category_pca(int(sys.argv[1]))
+    except:
+        print("First argument: positive int for n_component, 0 for 'mle'")
