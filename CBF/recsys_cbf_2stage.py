@@ -67,16 +67,6 @@ def load_samples(oversampling=(0, 0)):
         X = X[ovsp]
         y2 = y2[ovsp]
         y5 = y5[ovsp]
-        #         X_os.append(X[i])
-        # X_os, y5_os, y2_os = [], [], []
-        # for i in range(len(y5)):
-        #     if oversampling[0] <= y5[i] <= oversampling[1]:
-        #         X_os.append(X[i])
-        #         y2_os.append(y2[i])
-        #         y5_os.append(y5[i])
-        # X = np.row_stack((X, np.array(X_os)))
-        # y2 = np.array(list(y2) + y2_os)
-        # y5 = np.array(list(y5) + y5_os)
 
         n_samples, n_features = X.shape
         print(X.shape)
@@ -89,11 +79,10 @@ def load_samples(oversampling=(0, 0)):
         t = time()
         div = ShuffleSplit(n_samples, n_iter=5, test_size=0.2, random_state=0)
         for train, test in div:
-            # pre-training
+            # pre-training (no need to calculate y2_test)
             X_train = X[np.array(train)]
             X_test = X[np.array(test)]
             y2_train = y2[np.array(train)]
-            # y2_test = np.array([y2[i] for i in test])
             y5_train = y5[np.array(train)]
             y5_test = y5[np.array(test)]
 

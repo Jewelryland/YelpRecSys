@@ -14,7 +14,7 @@ def check_1():
     # result: 3295 'yelping_since' later than 'review_date' with 639 users
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.execute('SELECT yelping_since, review_date, user_id, review_count '
-                       'FROM (review JOIN user USING (user_id))')
+                           'FROM (review JOIN user USING (user_id))')
         abnormal_usrs = {}
         for row in cur:
             if row[0] * 100 + 1 > row[1]:
