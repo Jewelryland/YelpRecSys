@@ -20,7 +20,7 @@ class FeatureReformer(object):
             'y3': self._target_tri_reformer_
         }
 
-    def transform(self, opt='default', *kwargs):
+    def transform(self, opt='default', **kwargs):
         if opt in ('vector', 'y2'):
             return self.rf_dict[opt](kwargs)  # kwargs is a dict
         else:

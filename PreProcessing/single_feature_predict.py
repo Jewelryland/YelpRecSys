@@ -18,7 +18,8 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import ShuffleSplit
 from sklearn.metrics import *
 # from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.ensemble import ExtraTreesClassifier, ExtraTreesRegressor
+from feature_reformer import FeatureReformer
 
 # Constant values
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
@@ -31,69 +32,22 @@ latest = {'day': 20151224, 'month': 201512, 'year': 2015}
 valid_states = ['AZ', 'NV', 'ON', 'WI', 'QC', 'SC', 'EDH', 'PA', 'MLN', 'BW', 'NC', "IL"]
 
 
-class FeatureReformer(object):
-    def __init__(self, conn, view_name, attr_list):
-        self.cur = conn.execute('SELECT ' + ','.join(attr_list) + ' FROM ' + view_name)
-        self.rf_dict = {
-            'default': self._no_reformer_,
-            'log': self._log_reformer_,
-            'state': self._state_reformer_,
-            'vector': self._b_cas_reformer_,
-            '1d': self._col_vec_to_row_reformer_
-        }
-
-    def transform(self, opt='default'):
-        return self.rf_dict[opt]()
-
-    def _no_reformer_(self):
-        return np.array([row for row in self.cur])
-        # return np.array(np.array([row for row in self.cur]))
-
-    def _col_vec_to_row_reformer_(self):
-        return np.array([row[0] for row in self.cur])
-
-    def _state_reformer_(self):
-        samples = [
-            {0: row[0] if (row[0] in valid_states) else 'OTH'}
-            for row in self.cur
-        ]
-        dv = DictVectorizer()
-        return dv.fit_transform(samples).toarray()
-
-    def _log_reformer_(self):
-        samples = np.array([row for row in self.cur]) + 1
-        return FunctionTransformer(np.log1p).transform(samples)
-
-    def _b_cas_reformer_(self, n_components=10, impute=True):
-        cas = np.array([
-            (
-                [float(d) for d in row[0].split(';')[0:n_components]]
-                if row[0] else [0] * n_components
-            )
-            for row in self.cur
-        ])
-        if impute:  # imputation of missing values
-            return Imputer(strategy='mean', axis=0).fit_transform(cas)
-        else:
-            return cas
-
-
 # Loading samples from the database & pre-scale
 def load_samples_and_predict(attr_list, y, div, opt='default'):
     with sqlite3.connect(DB_PATH) as conn:
         X = FeatureReformer(conn, 'r_samples', attr_list).transform(opt)
         # n_samples, n_features = X.shape
     # oversampling
-    # X_os = []
-    # y_os = []
-    # for i in range(X.shape[0]):
-    #     if y[i] != 5:
-    #         X_os.append(X[i])
-    #         y_os.append(y[i])
-    # X = np.row_stack((X, np.array(X_os)))
-    # y = np.array(list(y) + y_os)
+    X_os = []
+    y_os = []
+    for i in range(X.shape[0]):
+        if y[i] != 5:
+            X_os.append(X[i])
+            y_os.append(y[i])
+    X = np.row_stack((X, np.array(X_os)))
+    y = np.array(list(y) + y_os)
 
-    model = ExtraTreesClassifier(n_estimators=5)
+    model = ExtraTreesRegressor(n_estimators=5)
     if len(attr_list) > 1:
         for i in range(len(attr_list)):
             t = time()
@@ -123,12 +77,12 @@ def train_and_predict(X, y, div, model):
         y_pred = model.predict(X_test)
 
         # Metrics below
-        f1_by_star = f1_score(y_true=y_test, y_pred=y_pred, average=None)
-        for i in range(5):
-            scores['f1_by_star'][i].append(f1_by_star[i])
-        # Calculate metrics for each label, and find their average, weighted by support
-        # (the number of true instances for each label).
-        scores['f1_weighted'].append(f1_score(y_true=y_test, y_pred=y_pred, average='weighted'))
+        # f1_by_star = f1_score(y_true=y_test, y_pred=y_pred, average=None)
+        # for i in range(5):
+        #     scores['f1_by_star'][i].append(f1_by_star[i])
+        # # Calculate metrics for each label, and find their average, weighted by support
+        # # (the number of true instances for each label).
+        # scores['f1_weighted'].append(f1_score(y_true=y_test, y_pred=y_pred, average='weighted'))
         scores['mae'].append(mean_absolute_error(y_true=y_test, y_pred=y_pred))
         scores['rmse'].append(mean_squared_error(y_true=y_test, y_pred=y_pred) ** 0.5)
         # print(classification_report(y_true=y_test, y_pred=y_pred), '\n')
@@ -136,9 +90,9 @@ def train_and_predict(X, y, div, model):
 
     # scores = np.array(scores)
     # print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-    print('F1-Score By Star Classes: %.3f | %.3f | %.3f | %.3f | %.3f'
-          % tuple([np.array(star).mean() for star in scores['f1_by_star']]))
-    print('F1-Score Weighted: %.3f' % (np.array(scores['f1_weighted']).mean()))
+    # print('F1-Score By Star Classes: %.3f | %.3f | %.3f | %.3f | %.3f'
+    #       % tuple([np.array(star).mean() for star in scores['f1_by_star']]))
+    # print('F1-Score Weighted: %.3f' % (np.array(scores['f1_weighted']).mean()))
     print('MAE: %.3f' % (np.array(scores['mae']).mean()))
     print('RMSE: %.3f' % (np.array(scores['rmse']).mean()))
     # feature_weights /= len(div)
