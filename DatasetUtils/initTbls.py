@@ -5,6 +5,7 @@ import sys
 import sqlite3
 import json
 import time
+from datetime import datetime
 
 __DATA_PATH__ = '/Users/Adward/OneDrive/YelpData/'
 __DB_PATH__ = os.path.join(__DATA_PATH__, 'yelp.sqlite')
@@ -12,6 +13,11 @@ VALID_STATES = ['AZ', 'NV', 'ON', 'WI', 'QC', 'SC', 'EDH', 'PA', 'MLN', 'BW', 'N
 TOTAL_NUM = {'b': {'open': 66878, 'all': 77445},
              'u': {'elite': 31461, 'all': 552339},
              'r': 2225213}
+n_sample = 2225213  # 1992542
+review_class = [260492, 190048, 282115, 591618, 900940]  # 2.6:1.9:2.8:5.9:9.0
+earliest = {'day': 20041018, 'month': 200410, 'year': 2004}
+latest = {'day': 20151224, 'month': 201512, 'year': 2015}
+earliest_day = datetime(2004, 10, 18)
 
 
 def init_business(): # & checkin
@@ -99,7 +105,6 @@ def init_user():
                     cur.execute('''CREATE TABLE user
                             (
                             user_id TEXT PRIMARY KEY NOT NULL,
-                            user_name TEXT,
                             review_count INT,
                             average_stars REAL,
                             votes INT,
@@ -107,7 +112,7 @@ def init_user():
                             yelping_since INT,
                             compliments INT,
                             fans INT
-                            )''') # intrinsic commit
+                            )''')  # intrinsic commit
                     cur.execute('DROP TABLE IF EXISTS friendship')
                     cur.execute('''CREATE TABLE friendship
                             (
@@ -119,17 +124,19 @@ def init_user():
                         row_num = 0
                         while True:
                             usr = json.loads(f.readline())
+                            ysince_lst = usr['yelping_since'].split('-')
+                            ysince_months = (int(ysince_lst[0])-2004) * 12 + (int(ysince_lst[1])-10)
                             insTuple = (usr['user_id'],
-                                        usr['name'],
+                                        # usr['name'],
                                         usr['review_count'],
                                         usr['average_stars'],
                                         sum(usr['votes'].values()),
                                         '&'.join([str(y) for y in usr['elite']]),
-                                        int(''.join(usr['yelping_since'].split('-'))),
+                                        ysince_months,
                                         sum(usr['compliments'].values()),
                                         usr['fans']
                                         )
-                            cur.execute('INSERT INTO user VALUES (?,?,?,?,?,?,?,?,?)', insTuple)
+                            cur.execute('INSERT INTO user VALUES (?,?,?,?,?,?,?,?)', insTuple)
                             for friend in usr['friends']:
                                 cur.execute('INSERT INTO friendship VALUES (?,?)', (usr['user_id'], friend))
                             conn.commit()
@@ -166,12 +173,13 @@ def init_review():
                         row_num = 0
                         while True:
                             revw = json.loads(f.readline())
+                            revw_d = [int(d) for d in revw['date'].split('-')]
                             insTuple = (
                                 revw['review_id'],
                                 revw['business_id'],
                                 revw['user_id'],
                                 revw['stars'],
-                                int(''.join(revw['date'].split('-'))),
+                                (datetime(revw_d[0], revw_d[1], revw_d[2]) - earliest_day).days,
                                 sum(revw['votes'].values())
                             )
                             cur.execute('INSERT INTO review VALUES (?,?,?,?,?,?)', insTuple)
@@ -308,11 +316,6 @@ def add_friends_star_stat():
                         )
                         GROUP BY user1_id, business_id''')
 
-
-def add_user_taste():
-    with sqlite3.connect(__DB_PATH__) as conn:
-        conn.execute('DROP TABLE IF EXISTS user_taste')
-        conn.execute('CREATE TABLE user_taste (user_id, )')
 
 
 if __name__ == '__main__':
