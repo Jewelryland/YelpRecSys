@@ -20,7 +20,7 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 
 	
 ## business
-> Opening Businesses: 66878
+> Opening Businesses: 66878 (In Valid States: 66830)
 >
 > 
  
@@ -46,7 +46,7 @@ Take a look at [some examples](https://github.com/Yelp/dataset-examples) to get 
 	    //'longitude': longitude,
 	    'stars': (star rating, rounded to half-stars),
 	    'review_count': review count,
-	    'categories': [(localized category names)]
+	    'categories': [(localized category names)] // 0-10 in list
 	    'open': True / False (corresponds to closed, not business hours),
 	    'hours': {
 	        (day_of_week): {
