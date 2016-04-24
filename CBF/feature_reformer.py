@@ -4,6 +4,11 @@ import numpy as np
 from sklearn.preprocessing import FunctionTransformer, Imputer, Binarizer
 from sklearn.feature_extraction import DictVectorizer
 
+# constants
+n_sample = 2225213  # 1992542
+review_class = [260492, 190048, 282115, 591618, 900940]  # 2.6:1.9:2.8:5.9:9.0
+earliest = {'day': 20041018, 'month': 200410, 'year': 2004}
+latest = {'day': 20151224, 'month': 201512, 'year': 2015}
 valid_states = ['AZ', 'NV', 'ON', 'WI', 'QC', 'SC', 'EDH', 'PA', 'MLN', 'BW', 'NC', "IL"]
 
 
@@ -72,3 +77,17 @@ class FeatureReformer(object):
     def _target_tri_reformer_(self):
         proj = [None, 0, 0, 1, 2, 2]
         return np.array([(proj[row[0]],) for row in self.cur])
+
+
+def over_sampling(targets, ovsp_class_range):
+    """
+    :param targets: Indexable 1d-array, row or column
+    :param ovsp_class_range: tuple[Int], len == 2
+    :return: 1-d np.array
+    """
+    ovsp = []
+    for i in range(len(targets)):
+        if ovsp_class_range[0] <= targets[i] <= ovsp_class_range[1]:
+            ovsp.append(i)
+    ovsp = np.array(list(range(len(targets))) + ovsp)
+    return np.array(ovsp)
