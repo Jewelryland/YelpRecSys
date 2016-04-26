@@ -8,26 +8,27 @@
   <body>
     <div id="main" style="width: 960px;height:600px;"></div>
     <script type="text/javascript">
-	    
-	    d3.csv("feat_cov_reg.csv", function(error, matrix){
+
+	    d3.csv("feat_cov_reg_3.csv", function(error, matrix){
 		    var x_axis = [];
 			for (var key in matrix[0]) {
 				x_axis.push(key);
 			}
 			var y_axis = x_axis.concat(['bstate', 'cas', 'tastes']);
-			
+
 			var data = [];
 			for (var row in matrix) {
 				var col = 0;
 				for (var key in matrix[row]) {
 					var blk = [parseInt(row), col, matrix[row][key]];
-					if (blk[2] > 0) {
+					if (blk[2] > 0 && col != row) {
+            //blk[2] = Math.sqrt(blk[2]).toFixed(3);
 						data.push(blk);
 					}
 					col += 1;
 				}
 			}
-			
+
 			data = data.map(function (item) {
     return [item[1], item[0], item[2] || '-'];
 });
@@ -76,11 +77,11 @@ option = {
             }
         }
     }]
-};  
+};
 
 myChart.setOption(option);
 	    });
-	    
+
     </script>
   </body>
 </html>

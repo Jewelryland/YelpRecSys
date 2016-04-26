@@ -11,7 +11,9 @@ with sqlite3.connect(DB_PATH) as conn:
     conn.execute('DROP VIEW IF EXISTS b_view')
     conn.execute('CREATE VIEW b_view AS '
                  'SELECT * FROM '
-                 '(business JOIN b_category_pca USING (business_id))')
+                 '(business JOIN b_category_pca USING (business_id)'
+                 ' LEFT OUTER JOIN bstat_by_elite USING (business_id))')
+                 #'(business JOIN b_category_pca USING (business_id))')
     conn.execute('DROP VIEW IF EXISTS u_view')
     conn.execute('CREATE VIEW u_view AS '
                  'SELECT * FROM '
@@ -21,7 +23,8 @@ with sqlite3.connect(DB_PATH) as conn:
                        'SELECT review.stars AS rstar, average_stars AS ustar, b_view.stars AS bstar, '
                        'b_view.review_count AS brcnt, b_view.state AS bstate, checkins, compliments, '
                        'fans, review_date AS rdate, u_view.review_count AS urcnt, '
-                       'u_view.votes AS uvotes, yelping_since AS ysince, cas, tastes '
+                       'u_view.votes AS uvotes, yelping_since AS ysince, '
+                       'avg_star_elite, avg_star_nonelite , cas, tastes '
                        'FROM '
                        '(review JOIN b_view'
                        '   USING (business_id)) '
