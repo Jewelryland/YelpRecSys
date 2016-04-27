@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+  <script src="third-party/d3/d3.min.js"></script>
+  <script src="echarts.min.js"></script>
+</head>
+<body>
+  <div id="main" style="width: 960px;height:600px;"></div>
+  <script type="text/javascript">
+
+  var myChart = echarts.init(document.getElementById('main'));
+
+  option = {
+    title: {
+        text: 'SelectKBest Scores'
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['F1-Weighted', 'MAE', 'RMSE']
+    },
+    toolbox: {
+        feature: {
+            saveAsImage: {}
+        }
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : ['2','3','4','5','6','7','8','9','10']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'F1-Weighted',
+            type:'line',
+            stack: '总量',
+            areaStyle: {normal: {}},
+            data:[0.442, 0.482, 0.555, 0.741, 0.742, 0.744, 0.744, 0.800, 0.801]
+        },
+        {
+            name:'MAE',
+            type:'line',
+            stack: '总量',
+            areaStyle: {normal: {}},
+            data:[0.785, 0.775, 0.714, 0.427, 0.426, 0.423, 0.423, 0.337, 0.332]
+        },
+        {
+            name:'RMSE',
+            type:'line',
+            stack: '总量',
+            areaStyle: {normal: {}},
+            data:[1.244, 1.249, 1.234, 0.970, 0.969, 0.966, 0.967, 0.881, 0.871]
+        }
+    ]
+};
+
+
+  myChart.setOption(option);
+
+  </script>
+</body>
+</html>
