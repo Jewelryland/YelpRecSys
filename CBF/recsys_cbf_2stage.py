@@ -24,6 +24,7 @@ from feature_reformer import FeatureReformer, over_sampling
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
 DB_PATH = os.path.join(DATA_PATH, 'yelp.sqlite')
 
+
 class RecScorer(object):
     def __init__(self, n_class=5):
         self.n_class = n_class
@@ -37,6 +38,10 @@ class RecScorer(object):
         f1_by_star = f1_score(y_true, y_pred, average=None)
         for i in range(self.n_class):
             self.scores['f1_by_star'][i].append(f1_by_star[i])
+        # Calculate metrics for each label, and find their average, weighted by support
+        # (the number of true instances for each label).
+        # This alters ‘macro’ to account for label imbalance;
+        # it can result in an F-score that is not between precision and recall.
         self.scores['f1_weighted'].append(f1_score(y_true, y_pred, average='weighted'))
         self.scores['mae'].append(mean_absolute_error(y_true, y_pred))
         self.scores['rmse'].append(mean_squared_error(y_true, y_pred) ** 0.5)
@@ -48,6 +53,13 @@ class RecScorer(object):
         print('F1-Score Weighted: %.3f' % (np.array(self.scores['f1_weighted']).mean()))
         print('MAE: %.3f' % (np.array(self.scores['mae']).mean()))
         print('RMSE: %.3f' % (np.array(self.scores['rmse']).mean()))
+
+    def finalScoreObj(self):
+        return {
+            'f1': np.array(self.scores['f1_weighted']).mean(),
+            'mae': np.array(self.scores['mae']).mean(),
+            'rmse': np.array(self.scores['rmse']).mean()
+        }
 
 
 def two_stage_rbf(oversampling=(0, 0)):
