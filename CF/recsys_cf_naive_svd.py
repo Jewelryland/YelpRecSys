@@ -90,38 +90,28 @@ if __name__ == '__main__':
     #     gen_sparse_rate_matrix(train, test)
 
     svd = TruncatedSVD(n_components=5, random_state=42)
-    r_matrix_train = np.load('r_matrix_train.npy')[()]  # coo_matrix
-    r_matrix_test = np.load('r_matrix_test.npy')[()]
+    r_matrix_train = np.load('r_matrix_train.npy')[()].tocsr()
+    r_matrix_test = np.load('r_matrix_test.npy')[()]  # coo_matrix
 
-    # print(sp_col.sum() / sp_col.getnnz())
-    # R = r_matrix_train.tocsc()  # .toarray()  # u_n * b_n
-    # print(R.shape)
-    # t = time()
-    # for j in range(R.shape[1]):
-    #     R[:, j] -= R[:, j].mean()
-    # print(R)
-    # print(time()-t)
+    # mean normalization
+    sums = r_matrix_train.sum(0)
+    nnzs = r_matrix_train.getnnz(0)
+    means = np.zeros((business_n, ))
+    for j in range(business_n):
+        nz = nnzs[j]
+        if nz:
+            means[j] = sums[0, j] / nz
+    for j in range(business_n):
+        r_matrix_train.data[j] -= means[r_matrix_train.indices[j]]
 
-
-    # scaler = StandardScaler(with_mean=True, with_std=False)
-    # scaler.fit(R)
-    # print(scaler.mean_, len(scaler.mean_))
-    # r_matrix_train = scaler.transform(r_matrix_train)
-
+    # training
     t = time()
     svd.fit(r_matrix_train)
     B = svd.components_
     U = svd.transform(r_matrix_train)  # numpy.ndarray
-    # save_sparse_csr('user_latent_space', csr_matrix(user_lfs))
-    # save_sparse_csr('business_latent_space', csr_matrix(business_lfs))
-    print(time()-t)
+    print('End training using SVD after', time()-t, 's')
 
-    # print(user_lfs.shape, business_lfs.shape)
-    # print(type(user_lfs), type(business_lfs))
-
-    # U = load_sparse_csr('user_latent_space.npz')
-    # B = load_sparse_csr('business_latent_space.npz')
-    # sp_r_matrix_test = np.load('r_matrix_test.npy')[()]
+    # predicting
     non_zero_n = r_matrix_test.data.shape[0]
     r_pred = np.zeros((non_zero_n, ))
 
@@ -130,8 +120,9 @@ if __name__ == '__main__':
         j = r_matrix_test.col[k]
         ui = U[i, :]
         vi = B[:, j]
-        r_pred[k] = ui.dot(vi)  # + scaler.mean_[j]
+        r_pred[k] = round(ui.dot(vi) + means[j])
 
+    # scoring
     print(r_pred)
     rmse = mean_squared_error(y_true=r_matrix_test.data, y_pred=r_pred) ** 0.5
     mae = mean_absolute_error(y_true=r_matrix_test.data, y_pred=r_pred)
