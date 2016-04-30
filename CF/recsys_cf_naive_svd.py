@@ -41,8 +41,8 @@ def gen_sparse_rate_matrix(train_idxs, test_idxs):
     with sqlite3.connect(DB_PATH) as conn:
         cur_r = conn.execute('SELECT business_id, user_id, stars FROM review')
         reviews = cur_r.fetchall()
-        train_reviews = np.array(reviews)[np.array(train)]
-        test_reviews = np.array(reviews)[np.array(test)]
+        train_reviews = np.array(reviews)[np.array(train_idxs)]
+        test_reviews = np.array(reviews)[np.array(test_idxs)]
 
         cur = conn.execute('SELECT user_id FROM user')
         uid_idx = {}
@@ -64,17 +64,17 @@ def gen_sparse_rate_matrix(train_idxs, test_idxs):
                 bid_idx[b[0]] = line_n
                 line_n += 1
 
-            r_matrix_train = np.zeros((user_n, line_n))
-            r_matrix_test = np.zeros((user_n, line_n))
+            R_train = np.zeros((user_n, line_n))
+            R_test = np.zeros((user_n, line_n))
             for r in train_reviews:
                 if r[0] in bid_idx:
-                    r_matrix_train[uid_idx[r[1]], bid_idx[r[0]]] = r[2]
+                    R_train[uid_idx[r[1]], bid_idx[r[0]]] = r[2]
             for r in test_reviews:
                 if r[0] in bid_idx:
-                    r_matrix_test[uid_idx[r[1]], bid_idx[r[0]]] = r[2]
+                    R_test[uid_idx[r[1]], bid_idx[r[0]]] = r[2]
             t = time()
-            train_sparse_matrixs.append(csr_matrix(r_matrix_train))
-            test_sparse_matrixs.append(csr_matrix(r_matrix_test))
+            train_sparse_matrixs.append(csr_matrix(R_train))
+            test_sparse_matrixs.append(csr_matrix(R_test))
             print(time()-t)
 
     print('Start stacking matrixs...')
@@ -89,42 +89,59 @@ if __name__ == '__main__':
     # for train, test in div:
     #     gen_sparse_rate_matrix(train, test)
 
-    svd = TruncatedSVD(n_components=5, random_state=42)
-    r_matrix_train = np.load('r_matrix_train.npy')[()].tocsr()
-    r_matrix_test = np.load('r_matrix_test.npy')[()]  # coo_matrix
+    R_train = np.load('r_matrix_train.npy')[()].tocsr()
+    # print(len(R_train.indptr))
+    R_test = np.load('r_matrix_test.npy')[()]  # coo_matrix
+    nonzero_n_train = R_train.data.shape[0]
+    nonzero_n_test = R_test.data.shape[0]
 
     # mean normalization
-    sums = r_matrix_train.sum(0)
-    nnzs = r_matrix_train.getnnz(0)
-    means = np.zeros((business_n, ))
+    sums = R_train.sum(0)  # 1 * business_n
+    nnzs = R_train.getnnz(0)
+    miu_b = np.zeros((business_n, ))
     for j in range(business_n):
         nz = nnzs[j]
         if nz:
-            means[j] = sums[0, j] / nz
-    for j in range(business_n):
-        r_matrix_train.data[j] -= means[r_matrix_train.indices[j]]
+            miu_b[j] = sums[0, j] / nz
+    sums = R_train.sum(1)  # user_n * 1
+    nnzs = R_train.getnnz(1)
+    miu_u = np.zeros((user_n, ))
+    for i in range(user_n):
+        nz = nnzs[i]
+        if nz:
+            miu_u[i] = sums[i, 0] / nz
+    miu_global = int(sum(sums) / sum(nnzs))
+    # print('miu', miu_global)
+    R_train_csc = R_train.tocsc()
+    for k in range(nonzero_n_train):
+        R_train.data[k] -= \
+            miu_b[R_train.indices[k]] + miu_u[R_train_csc.indices[k]] - miu_global
 
-    # training
-    t = time()
-    svd.fit(r_matrix_train)
-    B = svd.components_
-    U = svd.transform(r_matrix_train)  # numpy.ndarray
-    print('End training using SVD after', time()-t, 's')
+    for n_comp in range(1, 2):
+        # training
+        t = time()
+        svd = TruncatedSVD(n_components=n_comp, random_state=42)
+        svd.fit(R_train)
+        B = svd.components_
+        U = svd.transform(R_train)  # numpy.ndarray
+        print('End training using SVD after', time()-t, 's')
 
-    # predicting
-    non_zero_n = r_matrix_test.data.shape[0]
-    r_pred = np.zeros((non_zero_n, ))
+        # predicting
+        r_pred = np.zeros((nonzero_n_test, ))
+        for k in range(nonzero_n_test):
+            i = R_test.row[k]
+            j = R_test.col[k]
+            ui = U[i, :]
+            vi = B[:, j]
+            r_pred[k] = round(ui.dot(vi) + miu_b[j] + miu_u[i] - miu_global)
+            if r_pred[k] < 1:
+                r_pred[k] = 1
+            elif r_pred[k] > 5:
+                r_pred[k] = 5
 
-    for k in range(non_zero_n):
-        i = r_matrix_test.row[k]
-        j = r_matrix_test.col[k]
-        ui = U[i, :]
-        vi = B[:, j]
-        r_pred[k] = round(ui.dot(vi) + means[j])
-
-    # scoring
-    print(r_pred)
-    rmse = mean_squared_error(y_true=r_matrix_test.data, y_pred=r_pred) ** 0.5
-    mae = mean_absolute_error(y_true=r_matrix_test.data, y_pred=r_pred)
-    print(rmse, mae)
+        # scoring
+        rmse = mean_squared_error(y_true=R_test.data, y_pred=r_pred) ** 0.5
+        mae = mean_absolute_error(y_true=R_test.data, y_pred=r_pred)
+        print(rmse, mae)
+        print(classification_report(R_test.data, r_pred))
 
