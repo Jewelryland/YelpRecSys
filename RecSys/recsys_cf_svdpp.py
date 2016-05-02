@@ -87,8 +87,8 @@ class SVDPlusPlus(object):
         print("init latent factor dense matrix P, Q...") if verbose else None
         if warm_start:
             svd = TruncatedSVD(n_components=self.n_components)
-            svd.fit(R_train)
-            self.P = svd.transform(R_train)  # numpy.ndarray
+            svd.fit(X)
+            self.P = svd.transform(X)  # numpy.ndarray
             self.Q = svd.components_.T
         else:
             self.P = np.random.randn(n_user, k) / 1e5
@@ -135,10 +135,10 @@ class SVDPlusPlus(object):
                 #     print(uid * 100 / 552339, '%')
             gamma *= 0.93
             print('Finishing round', step, 'and', time()-t, 's used.') if verbose else None
-            # print(self.miu)
-            # print(self.bias_i)
-            # print(self.bias_u)
-            # print(self.item_weights)
+
+            # predicting
+            if R_test is None:
+                return
             self.predict_and_score(R_test)
 
     def predict_and_score(self, R):
@@ -173,6 +173,30 @@ class SVDPlusPlus(object):
         mae = mean_absolute_error(y_true=R.data, y_pred=r_pred)
         print('RMSE:', rmse, 'MAE:', mae)
         print(classification_report(R.data, r_pred))
+
+    def gen_latent_feature_space(self):
+        if self.P is None:
+            raise ValueError("Must be executed after SVD model is fitted. ")
+
+        with sqlite3.connect(DB_PATH) as conn:
+            cur = conn.execute('SELECT user_id FROM user')
+            uid_idx = {}
+            line_n = 0
+            for row in cur:
+                uid_idx[row[0]] = line_n
+                line_n += 1
+
+            cur = conn.execute('SELECT business_id FROM business')
+            bid_idx = {}
+            line_n = 0
+            for row in cur:
+                bid_idx[row[0]] = line_n
+                line_n += 1
+
+            cur_r = conn.execute('SELECT business_id, user_id FROM review')
+            X_part = [np.append(self.Q[bid_idx[bid]], self.P[uid_idx[uid]])
+                      for bid, uid in cur_r]
+            return np.array(X_part)
 
 
 if __name__ == '__main__':

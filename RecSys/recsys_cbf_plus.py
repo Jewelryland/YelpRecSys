@@ -15,16 +15,18 @@ import numpy as np
 # Import classifiers and performance metrics
 from sklearn.preprocessing import *
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.cross_validation import StratifiedKFold, ShuffleSplit
 from sklearn.metrics import *
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LinearRegression
-from sklearn.svm import LinearSVR
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
 from sklearn.decomposition import PCA
 from feature_reformer import FeatureReformer, over_sampling
 from recsys_cbf_2stage import RecScorer
-from sklearn.feature_selection import SelectKBest, f_classif
+from recsys_cf_naive_svd import NaiveSVD
+from recsys_cf_svdpp import SVDPlusPlus
+
 
 # Constant values
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
@@ -32,7 +34,7 @@ DB_PATH = os.path.join(DATA_PATH, 'yelp.sqlite')
 
 
 # Loading samples from the database & pre-scale
-def load_samples(oversampling=(0, 0), n_comp=1):
+def load_samples(oversampling=(0, 0), core=False, n_comp=1):
     """
     :param attr_list: List[Str], containing the list of features to be selected and encoded
     :param oversampling: Tuple(Int), double review samples with star classes in range
@@ -41,8 +43,16 @@ def load_samples(oversampling=(0, 0), n_comp=1):
     t = time()
     with sqlite3.connect(DB_PATH) as conn:
         # execute the script 'update_view' first if necessary
-        X = np.column_stack((
-            FeatureReformer(conn, 'r_samples', [
+        # svd = NaiveSVD(n_components=5)
+        # svd.fit(np.load('r_matrix.npy')[()].tocsr())
+        # svdpp = SVDPlusPlus(n_components=2, max_iter=2, tol=0.0001)
+        # svdpp.fit(np.load('r_matrix.npy')[()].tocsr(), verbose=False)
+
+        if core:
+            basic_features = FeatureReformer(conn, 'r_samples',
+                                             ['rstar', 'bstar', 'ustar']).transform()
+        else:
+            basic_features = FeatureReformer(conn, 'r_samples', [
                 'rstar',
                 'brcnt',
                 'bstar',
@@ -54,7 +64,9 @@ def load_samples(oversampling=(0, 0), n_comp=1):
                 'ustar',
                 'uvotes',
                 'ysince',
-                ]).transform(),
+                ]).transform()
+        X = np.column_stack((
+            basic_features,
             # Imputer(strategy='mean', axis=0).fit_transform(
             #     FeatureReformer(conn, 'r_samples', [
             #         'avg_star_elite',
@@ -62,8 +74,9 @@ def load_samples(oversampling=(0, 0), n_comp=1):
             #     ]).transform(),
             # ),
             # FeatureReformer(conn, 'r_samples', ['bstate']).transform('state'),
-            # FeatureReformer(conn, 'r_samples', ['cas']).transform('vector', n_components=n_comp),
+            FeatureReformer(conn, 'r_samples', ['cas']).transform('vector', n_components=n_comp),
             # FeatureReformer(conn, 'r_samples', ['tastes']).transform('vector', n_components=n_comp, impute=True),
+            # svdpp.gen_latent_feature_space(),
         ))
 
         # oversampling
@@ -89,7 +102,7 @@ def train_and_predict(X, y, div, model, n_features):
     # scores = cross_validation.cross_val_score(clf, data, target, cv=2, scoring='f1_weighted')
     t = time()
     rec_scorer = RecScorer(n_class=5)
-    if type(model).__name__ == 'LinearRegression':
+    if type(model).__name__ in ['LinearRegression']:
         rec_scorer = RecScorer(is_clsf=False)
     feature_weights = np.zeros(n_features)
     for train, test in div:
@@ -101,8 +114,20 @@ def train_and_predict(X, y, div, model, n_features):
         try:
             feature_weights += model.feature_importances_
         except:
-            feature_weights += model.coef_
+            try:
+                feature_weights += model.coef_
+            except:
+                pass
+
         y_pred = model.predict(X_test)
+        # if type(model).__name__ in ['LinearRegression']:
+        #     for k in range(len(y_pred)):
+        #         yp = round(y_pred[k])
+        #         if yp > 5:
+        #             yp = 5
+        #         elif yp < 1:
+        #             yp = 1
+        #         y_pred[k] = yp
 
         # Metrics below
         rec_scorer.record(y_true=y_test, y_pred=y_pred)
@@ -122,18 +147,21 @@ def train_and_predict(X, y, div, model, n_features):
 if __name__ == '__main__':
     model_type = sys.argv[1]
     n_iter_num = int(sys.argv[2])
-    if model_type == 'rf':
-        model = RandomForestClassifier(n_estimators=5)  # max_features='auto'; int(math.sqrt(n_features)))
-    elif model_type == 'erf':  # 'erf'
-        model = ExtraTreesClassifier(n_estimators=5)
-    else:
-        model = LinearRegression(normalize=False)
-    # model = GradientBoostingClassifier(n_estimators=5, learning_rate=1, max_depth=2, random_state=0)
+    model_dict = {
+        'rf': RandomForestClassifier(n_estimators=5),  # max_features='auto'; int(math.sqrt(n_features)))
+        'lr': LinearRegression(normalize=False),
+        'gbdt': GradientBoostingClassifier(n_estimators=5)
+    }
+    model_dict.setdefault('erf', ExtraTreesClassifier(n_estimators=5))
+    model = model_dict[model_type]
 
-    n_comp = 5
-    samples, targets, n_samples, n_features = load_samples(oversampling=(1, 4), n_comp=n_comp)
+    samples, targets, n_samples, n_features = load_samples(oversampling=(1, 4), core=True, n_comp=1)
     div = ShuffleSplit(n_samples, n_iter=n_iter_num, test_size=0.2, random_state=0)
     train_and_predict(samples, targets, div, model, n_features)
+    # for key in model_dict:
+    #     print('\n', key)
+    #     model = model_dict[key]
+    #     train_and_predict(samples, targets, div, model, n_features)
 
     '''
     f1s, maes, rmses = [], [], []

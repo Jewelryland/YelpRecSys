@@ -112,19 +112,17 @@ class NaiveSVD(object):
         self.miu_u = None
         self.miu_b = None
 
-    def predict(self, R_test):
-        r_pred = np.zeros((self.nonzero_n_test, ))
-        for k in range(self.nonzero_n_test):
-            i = R_test.row[k]
-            j = R_test.col[k]
-            ui = self.U[i, :]
-            vi = self.B[:, j]
-            r_pred[k] = round(ui.dot(vi) + self.miu_b[j] + self.miu_u[i] - self.miu_global)
-            if r_pred[k] < 1:
-                r_pred[k] = 1
-            elif r_pred[k] > 5:
-                r_pred[k] = 5
-        return r_pred
+    def predict(self, i, j, rounded=True):
+        ui = self.U[i, :]
+        vi = self.B[:, j]
+        r = ui.dot(vi) + self.miu_b[j] + self.miu_u[i] - self.miu_global
+        if rounded:
+            r = round(r)
+            if r < 1:
+                r = 1
+            elif r > 5:
+                r = 5
+        return r
 
     def fit(self, R_train, R_test=None):
         if sp.issparse(R_train) and R_train.getformat() not in ["csr"]:
@@ -167,7 +165,11 @@ class NaiveSVD(object):
         if sp.issparse(R_test) and R_test.getformat() not in ["coo"]:
             R_test = R_test.tocoo()
         self.nonzero_n_test = R_test.data.shape[0]
-        r_pred = self.predict(R_test)
+        r_pred = np.zeros((self.nonzero_n_test, ))
+        for k in range(self.nonzero_n_test):
+            i = R_test.row[k]
+            j = R_test.col[k]
+            r_pred[k] = self.predict(i, j)
 
         # scoring
         rmse = mean_squared_error(y_true=R_test.data, y_pred=r_pred) ** 0.5
@@ -175,7 +177,7 @@ class NaiveSVD(object):
         print(rmse, mae)
         print(classification_report(R_test.data, r_pred))
 
-    def gen_latent_feature_space(self, n_components=1):
+    def gen_latent_feature_space(self, predicted=False, rounded=True):
         if self.B is None:
             raise ValueError("Must be executed after SVD model is fitted. ")
 
@@ -195,9 +197,13 @@ class NaiveSVD(object):
                 line_n += 1
 
             cur_r = conn.execute('SELECT business_id, user_id FROM review')
-            X_part = np.array([np.append(self.B[:, bid], self.U[uid, :])
-                               for bid, uid in cur_r])
-            return X_part
+            if predicted:
+                X_part = [(self.predict(uid_idx[uid], bid_idx[bid], rounded=rounded), )
+                          for bid, uid in cur_r]
+            else:
+                X_part = [np.append(self.B[:, bid_idx[bid]], self.U[uid_idx[uid], :])
+                          for bid, uid in cur_r]
+            return np.array(X_part)
 
 
 if __name__ == '__main__':
@@ -205,13 +211,13 @@ if __name__ == '__main__':
     # for train, test in div:
     #     gen_sparse_rate_matrix((train, 'r_matrix_train'), (test, 'r_matrix_test'))
 
-    gen_sparse_rate_matrix((None, 'r_matrix'))
+    # gen_sparse_rate_matrix((None, 'r_matrix'))
 
-    # R_train = np.load('r_matrix_train.npy')[()].tocsr()
-    # R_test = np.load('r_matrix_test.npy')[()]  # coo_matrix
-    #
-    # for n_comp in range(1, 2):
-    #     t = time()
-    #     svd = NaiveSVD(n_components=1)
-    #     svd.fit(R_train, R_test)
-    #     print('End training using SVD after', time()-t, 's')
+    R_train = np.load('r_matrix_train.npy')[()].tocsr()
+    R_test = np.load('r_matrix_test.npy')[()]  # coo_matrix
+
+    for n_comp in range(1, 2):
+        t = time()
+        svd = NaiveSVD(n_components=1)
+        svd.fit(R_train, R_test)
+        print('End training using SVD after', time()-t, 's')
