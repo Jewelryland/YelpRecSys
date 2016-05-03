@@ -18,7 +18,7 @@ from minepy import MINE
 from sklearn.cross_validation import ShuffleSplit
 from sklearn.metrics import *
 from sklearn.ensemble import ExtraTreesRegressor
-from feature_reformer import FeatureReformer
+from ..RecSys.feature_reformer import FeatureReformer
 
 # Constant values
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
@@ -27,7 +27,6 @@ CODE_PATH = '/Users/Adward/Github/YelpRecSys/PreProcessing/'
 
 
 # Loading samples from the database & pre-scale
-n_comp = 5
 flist1 = [
     'rstar',
     'brcnt',
@@ -41,25 +40,25 @@ flist1 = [
     'uvotes',
     'ysince',
     ]
-flist2 = ['avg_star_elite', 'avg_star_nonelite']
-flist3 = ['bstate']
+# flist2 = ['avg_star_elite', 'avg_star_nonelite']
+# flist3 = ['bstate']
 flist4 = ['cas']
 flist5 = ['tastes']
 
-fl = [(i, i+1) for i in range(len(flist1)+len(flist2))]
-fl += [(len(fl), len(fl)+13), (len(fl)+13, len(fl)+18), (len(fl)+18, len(fl)+23)]
+# fl = [(i, i+1) for i in range(len(flist1)+len(flist2))]
+# fl += [(len(fl), len(fl)+13), (len(fl)+13, len(fl)+18), (len(fl)+18, len(fl)+23)]
 
 
-def load_samples():
+def load_samples(n_comp=1):
     t = time()
     with sqlite3.connect(DB_PATH) as conn:
         # execute the script 'update_view' first if necessary
         X = np.column_stack((
             FeatureReformer(conn, 'r_samples', flist1).transform(),
-            Imputer(strategy='mean', axis=0).fit_transform(
-                FeatureReformer(conn, 'r_samples', flist2).transform()
-            ),
-            FeatureReformer(conn, 'r_samples', flist3).transform('state'),
+            # Imputer(strategy='mean', axis=0).fit_transform(
+            #     FeatureReformer(conn, 'r_samples', flist2).transform()
+            # ),
+            # FeatureReformer(conn, 'r_samples', flist3).transform('state'),
             FeatureReformer(conn, 'r_samples', flist4).transform('vector', n_components=n_comp),
             FeatureReformer(conn, 'r_samples', flist5).transform('vector', n_components=n_comp, impute=True),
         ))
@@ -102,7 +101,7 @@ def get_corrcoef(X):
 # np.savetxt(os.path.join(CODE_PATH, 'feat_sim_1.csv'), pm, fmt='%.3f', delimiter=',')
 
 
-def predict_with_one(X):
+def predict_with_one(X, out_file_name):
     n_samples, n_features = X.shape
     iter_num = 3
     div = ShuffleSplit(n_samples, n_iter=iter_num, test_size=0.2, random_state=0)
@@ -115,24 +114,37 @@ def predict_with_one(X):
         round_num += 1
         train_samples = X[np.array(train)]
         test_samples = X[np.array(test)]
-        for i in range(len(fl)):
-            for j in range(len(fl)):
-                if fl[j][1]-fl[j][0] != 1:
-                    continue
-                X_train = train_samples[:, fl[i][0]:fl[i][1]]
-                X_test = test_samples[:, fl[i][0]:fl[i][1]]
-                y_train = train_samples[:, fl[j][0]]
-                y_test = test_samples[:, fl[j][0]]
+        for i in range(n_features):
+            for j in range(n_features):
+                X_train = train_samples[:, i:i+1]
+                X_test = test_samples[:, i:i+1]
+                y_train = train_samples[:, j]
+                y_test = test_samples[:, j]
+        # for i in range(len(fl)):
+        #     for j in range(len(fl)):
+        #         if fl[j][1]-fl[j][0] != 1:
+        #             continue
+        #         X_train = train_samples[:, fl[i][0]:fl[i][1]]
+        #         X_test = test_samples[:, fl[i][0]:fl[i][1]]
+        #         y_train = train_samples[:, fl[j][0]]
+        #         y_test = test_samples[:, fl[j][0]]
                 model.fit(X_train, y_train)
                 y_pred = model.predict(X_test)
                 mae = mean_absolute_error(y_test, y_pred)
                 score_matrix[i, j] += mae
                 print('Round', round_num, '|', i, j, mae, time()-t)
-    np.savetxt(os.path.join(CODE_PATH, 'feat_sim_reg.csv'),
+    np.savetxt(os.path.join(CODE_PATH, out_file_name),
                score_matrix/iter_num, fmt='%.3f', delimiter=',')
 
 
 if __name__ == '__main__':
-    X = load_samples()
+    fname = sys.argv[1]
+    try:
+        if fname.split('.')[-1] != 'csv':
+            raise ValueError()
+    except:
+        print('Need to be .csv file for output!')
+
+    X = load_samples(1)
     # get_corrcoef(X)
-    predict_with_one(X)
+    predict_with_one(X, fname)
