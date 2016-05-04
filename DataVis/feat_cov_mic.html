@@ -6,7 +6,7 @@
     <script src="echarts.min.js"></script>
   </head>
   <body>
-    <div id="main" style="width: 1600px;height:1000px;"></div>
+    <div id="main" style="width: 960px;height:600px;"></div>
     <script type="text/javascript">
 
 	    d3.csv("feat_sim_mic_0.05.csv", function(error, matrix){
@@ -20,7 +20,7 @@
 				var col = 0;
 				for (var key in matrix[row]) {
 					var blk = [parseInt(row), col, matrix[row][key]];
-					if (row > col) {
+					if (row >= col) {
 						data.push(blk);
 					}
 					col += 1;
