@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+  <script src="third-party/d3/d3.min.js"></script>
+  <script src="echarts.min.js"></script>
+</head>
+<body>
+  <div id="f1" style="width: 960px;height:600px;"></div>
+  <div id="mae" style="width: 960px;height:600px;"></div>
+  <div id="rmse" style="width: 960px;height:600px;"></div>
+  <div id="b_weight" style="width: 960px;height:600px;"></div>
+  <script type="text/javascript">
+
+  var f1_chart = echarts.init(document.getElementById('f1'));
+
+  option1 = {
+    title : {
+        text: 'F1-Weighted',
+        subtext: ''
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : ['1','2','3','4','5']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel : {
+                formatter: '{value}'
+            },
+            min: 0.72
+        }
+    ],
+    series : [
+        {
+            name:'SVD',
+            type:'line',
+            data:[0.735, 0.759, 0.766, 0.768, 0.770],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD++',
+            type:'line',
+            data:[0.729, 0.746, 0.751, 0.755, 0.755],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+ustar',
+            type:'line',
+            data:[0.762, 0.771, 0.775, 0.776, 0.777],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+time',
+            type:'line',
+            data:[0.770, 0.774, 0.776, 0.779, 0.780],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+  f1_chart.setOption(option1);
+
+  var mae_chart = echarts.init(document.getElementById('mae'));
+
+  option2 = {
+    title : {
+        text: 'MAE',
+        subtext: ''
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : ['1','2','3','4','5']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel : {
+                formatter: '{value}'
+            },
+            min: 0.33
+        }
+    ],
+    series : [
+        {
+            name:'SVD',
+            type:'line',
+            data:[0.483, 0.424, 0.405, 0.402, 0.396],
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD++',
+            type:'line',
+            data:[0.505, 0.471, 0.456, 0.446, 0.445],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+ustar',
+            type:'line',
+            data:[0.412, 0.393, 0.382, 0.382, 0.378],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+time',
+            type:'line',
+            data:[0.412, 0.399, 0.395, 0.388, 0.382],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+  mae_chart.setOption(option2);
+
+  var rmse_chart = echarts.init(document.getElementById('rmse'));
+
+  option3 = {
+    title : {
+        text: 'RMSE',
+        subtext: ''
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : ['1','2','3','4','5']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel : {
+                formatter: '{value}'
+            },
+            min: 0.9
+        }
+    ],
+    series : [
+        {
+            name:'SVD',
+            type:'line',
+            data:[1.095, 1.011, 0.981, 0.976, 0.968],
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD++',
+            type:'line',
+            data:[1.135, 1.096, 1.073, 1.057, 1.057],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+ustar',
+            type:'line',
+            data:[0.985, 0.959, 0.942, 0.944, 0.938],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+time',
+            type:'line',
+            data:[1.010, 0.988, 0.982, 0.971, 0.961],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+  rmse_chart.setOption(option3);
+
+  var b_weight_chart = echarts.init(document.getElementById('b_weight'));
+
+  option4 = {
+    title : {
+        text: 'Business Weight',
+        subtext: ''
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : ['1','2','3','4','5']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel : {
+                formatter: '{value} %'
+            },
+            min: 30.0
+        }
+    ],
+    series : [
+        {
+            name:'SVD',
+            type:'line',
+            data:[36.4, 37.8, 36.0, 34.7, 34.7],
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD++',
+            type:'line',
+            data:[47.9, 56.5, 50.5, 51.9, 54.6],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+ustar',
+            type:'line',
+            data:[43.2, 45.8, 44.6, 45.8, 43.5],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        },
+        {
+            name:'SVD+time',
+            type:'line',
+            data:[32.9, 36.4, 39.9, 40.8, 41.3],
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+  b_weight_chart.setOption(option4);
+
+  </script>
+</body>
+</html>
