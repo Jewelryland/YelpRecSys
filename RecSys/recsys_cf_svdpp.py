@@ -23,6 +23,7 @@ import warnings
 # Constant values
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
 DB_PATH = os.path.join(DATA_PATH, 'yelp.sqlite')
+CODE_PATH = os.path.join(os.path.dirname(__file__))
 # review_n = 2225213
 # user_n = 552339
 # business_n = 77445
@@ -45,7 +46,7 @@ class SVDPlusPlus(object):
     #     self.fit_transform(X)
     #     return self
 
-    def fit(self, X, R_test=None, lambda_=0.0004, gamma=0.0001, verbose=False, warm_start=True):
+    def fit(self, X, R_test=None, lambda_=0.04, gamma=0.15, verbose=False, warm_start=True):
         warnings.filterwarnings('error')
         # If sparse and not csr or csc, convert to csr
         if sp.issparse(X) and X.getformat() not in ["csr", "csc"]:
@@ -200,7 +201,7 @@ class SVDPlusPlus(object):
 
 
 if __name__ == '__main__':
-    R_train = np.load('r_matrix_train.npy')[()]
-    R_test = np.load('r_matrix_test.npy')[()]
-    svdpp = SVDPlusPlus(max_iter=10, tol=0.0001)
+    R_train = np.load(os.path.join(CODE_PATH, 'r_matrix_train.npy'))[()]
+    R_test = np.load(os.path.join(CODE_PATH, 'r_matrix_test.npy'))[()]
+    svdpp = SVDPlusPlus(n_components=1, max_iter=1, tol=0.1)
     svdpp.fit(R_train, R_test, verbose=True, warm_start=False)

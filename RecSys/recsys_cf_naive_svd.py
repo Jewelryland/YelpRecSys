@@ -22,6 +22,7 @@ from scipy.io import mmread
 # Constant values
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
 DB_PATH = os.path.join(DATA_PATH, 'yelp.sqlite')
+CODE_PATH = os.path.join(os.path.dirname(__file__))
 review_n = 2225213
 user_n = 552339
 business_n = 77445
@@ -213,11 +214,11 @@ if __name__ == '__main__':
 
     # gen_sparse_rate_matrix((None, 'r_matrix'))
 
-    R_train = np.load('r_matrix_train.npy')[()].tocsr()
-    R_test = np.load('r_matrix_test.npy')[()]  # coo_matrix
+    R_train = np.load(os.path.join(CODE_PATH, 'r_matrix_train.npy'))[()].tocsr()
+    R_test = np.load(os.path.join(CODE_PATH, 'r_matrix_test.npy'))[()]  # coo_matrix
 
     for n_comp in range(1, 2):
         t = time()
-        svd = NaiveSVD(n_components=1)
+        svd = NaiveSVD(n_components=5)
         svd.fit(R_train, R_test)
         print('End training using SVD after', time()-t, 's')
