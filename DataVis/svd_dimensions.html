@@ -23,7 +23,7 @@
         trigger: 'axis'
     },
     legend: {
-        data:['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+        data:['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
         show : true,
@@ -84,9 +84,9 @@
             }
         },
         {
-            name:'SVD+time',
+            name:'SVD+bias',
             type:'line',
-            data:[0.770, 0.774, 0.776, 0.779, 0.780],
+            data:[0.789, 0.794, 0.796, 0.797, 0.798],
             markLine : {
                 data : [
                     {type : 'average', name : '平均值'}
@@ -109,7 +109,7 @@
         trigger: 'axis'
     },
     legend: {
-        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
         show : true,
@@ -135,7 +135,7 @@
             axisLabel : {
                 formatter: '{value}'
             },
-            min: 0.33
+            min: 0.3
         }
     ],
     series : [
@@ -170,9 +170,9 @@
             }
         },
         {
-            name:'SVD+time',
+            name:'SVD+bias',
             type:'line',
-            data:[0.412, 0.399, 0.395, 0.388, 0.382],
+            data:[0.344, 0.330, 0.325, 0.324, 0.321],
             markLine : {
                 data : [
                     {type : 'average', name : '平均值'}
@@ -195,7 +195,7 @@
         trigger: 'axis'
     },
     legend: {
-        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
         show : true,
@@ -221,7 +221,7 @@
             axisLabel : {
                 formatter: '{value}'
             },
-            min: 0.9
+            min: 0.8
         }
     ],
     series : [
@@ -256,9 +256,9 @@
             }
         },
         {
-            name:'SVD+time',
+            name:'SVD+bias',
             type:'line',
-            data:[1.010, 0.988, 0.982, 0.971, 0.961],
+            data:[0.867, 0.842, 0.834, 0.832, 0.828],
             markLine : {
                 data : [
                     {type : 'average', name : '平均值'}
@@ -274,14 +274,14 @@
 
   option4 = {
     title : {
-        text: 'Business Weight',
+        text: 'Business LFM Weight',
         subtext: ''
     },
     tooltip : {
         trigger: 'axis'
     },
     legend: {
-        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+time']
+        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
         show : true,
@@ -342,9 +342,9 @@
             }
         },
         {
-            name:'SVD+time',
+            name:'SVD+bias',
             type:'line',
-            data:[32.9, 36.4, 39.9, 40.8, 41.3],
+            data:[40.9, 37.3, 36.1, 37.8, 35.1],
             markLine : {
                 data : [
                     {type : 'average', name : '平均值'}

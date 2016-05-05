@@ -6,7 +6,7 @@
   <script src="echarts.min.js"></script>
 </head>
 <body>
-  <div id="main" style="width: 960px;height:600px;"></div>
+  <div id="main" style="width: 1200px;height:640px;"></div>
   <script type="text/javascript">
 
   var myChart = echarts.init(document.getElementById('main'));
@@ -36,12 +36,13 @@
         {
             type : 'category',
             boundaryGap : false,
-            data : ['fans','compliments','tastes','ysince','uvotes','bstar','urcnt','checkins','cas','brcnt','rdate','ustar']
+            data : ['none','tastes','cas','checkins','brcnt','compliments','uvotes','fans','rdate','urcnt','ysince','bstar']
         }
     ],
     yAxis : [
         {
-            type : 'value'
+            type : 'value',
+            min: 0.3
         }
     ],
     series : [
@@ -50,21 +51,21 @@
             type:'line',
             stack: '总量',
             areaStyle: {normal: {}},
-            data: [0.8010, 0.8013, 0.7999, 0.7444, 0.7441, 0.7421, 0.7416, 0.5523, 0.4822, 0.4422, 0.3803]
+            data: [0.8010, 0.8010, 0.8013, 0.7999, 0.7444, 0.7441, 0.7421, 0.7416, 0.5523, 0.4822, 0.4422, 0.3803]
         },
         {
             name:'MAE',
             type:'line',
             stack: '总量',
             areaStyle: {normal: {}},
-            data: [0.3301, 0.3321, 0.3367, 0.4222, 0.4224, 0.4254, 0.4262, 0.7145, 0.7753, 0.7854, 0.8902]
+            data: [0.3300, 0.3301, 0.3321, 0.3367, 0.4222, 0.4224, 0.4254, 0.4262, 0.7145, 0.7753, 0.7854, 0.8902]
         },
         {
             name:'RMSE',
             type:'line',
             stack: '总量',
             areaStyle: {normal: {}},
-            data: [0.8664, 0.8718, 0.8807, 0.9660, 0.9659, 0.9685, 0.9690, 1.2337, 1.2489, 1.2442, 1.3646]
+            data: [0.8670, 0.8664, 0.8718, 0.8807, 0.9660, 0.9659, 0.9685, 0.9690, 1.2337, 1.2489, 1.2442, 1.3646]
         }
     ]
 };
