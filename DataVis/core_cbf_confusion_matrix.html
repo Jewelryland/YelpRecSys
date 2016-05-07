@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+  <head>
+    <script src="third-party/d3/d3.min.js"></script>
+    <script src="echarts.min.js"></script>
+  </head>
+  <body>
+    <div id="main" style="width: 960px;height:600px;"></div>
+    <script type="text/javascript">
+
+	     mat = [[ 94144,   2500,   2125,   3044,   2170],
+              [  3545,  63029,   2787,   4252,   2314],
+              [  2939,   2693,  94855,   8045,   4138],
+              [  3705,   3912,   8131, 208914,  12684],
+              [  9118,   7675,  13826,  44222, 105131]];
+      data = [];
+      for (var i = 0; i < 5; i++) {
+        //var sum_i = 0;
+        for (var j = 0; j < 5; j++) {
+          //sum_i += mat[i][j];
+          data.push([i, j, mat[i][j]]);
+        }
+        //data.push([i, 5, sum_i]);
+      }
+			// data = data.map(function (item) {
+      //   return [item[1], item[0], item[2] || '-'];
+      // });
+      xy_axis = [1.0, 2.0, 3.0, 4.0, 5.0];
+
+var myChart = echarts.init(document.getElementById('main'));
+
+option = {
+    tooltip: {
+        position: 'top'
+    },
+    animation: false,
+    grid: {
+        height: '60%',
+        x: '15%',
+        y: '10%'
+    },
+    xAxis: {
+        type: 'category',
+        data: xy_axis,
+        name: 'Actual Classes'
+    },
+    yAxis: {
+        type: 'category',
+        data: xy_axis,
+        name: 'Predicted Classes'
+    },
+    visualMap: {
+        min: 3000,
+        max: 200000,
+        calculable: true,
+        orient: 'horizontal',
+        left: 'center',
+        bottom: '20%'
+    },
+    series: [{
+        name: 'Punch Card',
+        type: 'heatmap',
+        data: data,
+        label: {
+            normal: {
+                show: true
+            }
+        },
+        itemStyle: {
+            emphasis: {
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+        }
+    }]
+};
+
+myChart.setOption(option);
+
+    </script>
+  </body>
+</html>

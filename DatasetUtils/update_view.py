@@ -17,14 +17,14 @@ with sqlite3.connect(DB_PATH) as conn:
     conn.execute('DROP VIEW IF EXISTS u_view')
     conn.execute('CREATE VIEW u_view AS '
                  'SELECT * FROM '
-                 '(user LEFT OUTER JOIN friends_taste USING (user_id))')
+                 '(user LEFT OUTER JOIN friends_taste USING (user_id)) JOIN user_reside USING (user_id)')
     conn.execute('DROP VIEW IF EXISTS r_samples')
     cur = conn.execute('CREATE VIEW r_samples AS '
                        'SELECT review.stars AS rstar, average_stars AS ustar, b_view.stars AS bstar, '
                        'b_view.review_count AS brcnt, b_view.state AS bstate, checkins, compliments, '
                        'fans, review_date AS rdate, u_view.review_count AS urcnt, '
                        'u_view.votes AS uvotes, yelping_since AS ysince, '
-                       'avg_star_elite, avg_star_nonelite , cas, tastes '
+                       'avg_star_elite, avg_star_nonelite , cas, tastes, user_state '
                        'FROM '
                        '(review JOIN b_view'
                        '   USING (business_id)) '
