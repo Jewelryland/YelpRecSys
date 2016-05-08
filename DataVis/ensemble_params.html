@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+  <script src="third-party/d3/d3.min.js"></script>
+  <script src="echarts.min.js"></script>
+</head>
+<body>
+  <div id="main" style="width: 1200px;height:640px;"></div>
+  <script type="text/javascript">
+
+  var labelFormatter = function(p){
+    return p.name == 'F1-Weighted' ? (1.0-p.value) : p.value;
+  };
+
+  var myChart = echarts.init(document.getElementById('main'));
+
+  option = {
+    title : {
+        text: 'Ensemble Parameters'
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:[
+            'Baseline CF(4)','Baseline CF(6)','Baseline CBF(5)','',
+            'Double Sample CF(4)','Double Sample CF(6)','Double Sample CBF(5)','',
+            'Triple Sample CF(4)','Triple Sample CF(6)','Triple Sample CBF(5)'
+        ]
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    grid: {y: 70, y2:30, x2:20},
+    xAxis : [
+        {
+            type : 'category',
+            data : ['Runtime(min)','F1 Weighted','MAE','RMSE']
+        },
+        {
+            type : 'category',
+            axisLine: {show:false},
+            axisTick: {show:false},
+            axisLabel: {show:false},
+            splitArea: {show:false},
+            splitLine: {show:false},
+            data : ['Runtime','F1-Weighted','MAE','RMSE']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel:{formatter:'{value}'}
+        }
+    ],
+    series : [
+      {
+          name:'Triple Sample CF(4)',
+          type:'line',
+          //xAxisIndex:1,
+          itemStyle: {normal: {color:'rgba(193,35,43,1)', label:{
+            show:true
+          }}},
+          data:[1.100, 0.956, 0.074, 0.399]
+      },
+      {
+          name:'Triple Sample CF(6)',
+          type:'line',
+          //xAxisIndex:1,
+          itemStyle: {normal: {color:'rgba(181,195,52,1)', label:{
+            show:true
+            //textStyle:{color:'#27727B'}
+          }}},
+          data:[1.363, 0.958, 0.070, 0.390]
+      },
+      {
+          name:'Triple Sample CBF(5)',
+          type:'line',
+          itemStyle: {normal: {color:'rgba(39,114,123,1)', label:{
+            show:true
+            //textStyle:{color:'#E87C25'}
+          }}},
+          data:[1.167, 0.977, 0.038, 0.287]
+      },
+        {
+            name:'Double Sample CF(4)',
+            type:'line',
+            xAxisIndex:1,
+            itemStyle: {normal: {color:'rgba(193,35,43,0.7)', label:{
+              show:true
+            }}},
+            data:[0.683, 0.874, 0.208, 0.667]
+        },
+        {
+            name:'Double Sample CF(6)',
+            type:'line',
+            xAxisIndex:1,
+            itemStyle: {normal: {color:'rgba(181,195,52,0.7)', label:{
+              show:true
+              //textStyle:{color:'#27727B'}
+            }}},
+            data:[0.850, 0.878, 0.198, 0.648]
+        },
+        {
+            name:'Double Sample CBF(5)',
+            type:'line',
+            itemStyle: {normal: {color:'rgba(39,114,123,0.7)', label:{
+              show:true
+              //textStyle:{color:'#E87C25'}
+            }}},
+            data:[0.745, 0.889, 0.183, 0.630]
+        },
+        {
+            name:'Baseline CF(4)',
+            type:'line',
+            itemStyle: {normal: {color:'rgba(193,35,43,0.3)', label:{
+              show:true
+            }}},
+            data:[0.567, 0.789, 0.344, 0.867]
+        },
+        {
+            name:'Baseline CF(6)',
+            type:'line',
+            xAxisIndex:1,
+            itemStyle: {normal: {color:'rgba(181,195,52,0.3)', label:{
+              show:true
+            }}},
+            data:[0.667, 0.794, 0.330, 0.842]
+        },
+        {
+            name:'Baseline CBF(5)',
+            type:'line',
+            xAxisIndex:1,
+            itemStyle: {normal: {color:'rgba(39,114,123,0.3)', label:{
+              show:true
+            }}},
+            data:[0.572, 0.791, 0.342, 0.873]
+        }
+    ]
+};
+
+  myChart.setOption(option);
+
+  </script>
+</body>
+</html>
