@@ -2,7 +2,6 @@
 <meta charset="utf-8">
 <html>
 <head>
-  <script src="third-party/d3/d3.min.js"></script>
   <script src="echarts.min.js"></script>
 </head>
 <body>
@@ -16,85 +15,85 @@
 
   option1 = {
     title : {
-        text: 'F1-Weighted',
-        subtext: ''
+      text: 'F1-Weighted',
+      subtext: ''
     },
     tooltip : {
-        trigger: 'axis'
+      trigger: 'axis'
     },
     legend: {
-        data:['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
+      data:['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
+      show : true,
+      feature : {
+        mark : {show: true},
+        dataView : {show: true, readOnly: false},
+        magicType : {show: true, type: ['line', 'bar']},
+        restore : {show: true},
+        saveAsImage : {show: true}
+      }
     },
     calculable : true,
     xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : ['1','2','3','4','5']
-        }
+      {
+        type : 'category',
+        boundaryGap : false,
+        data : ['1','2','3','4','5']
+      }
     ],
     yAxis : [
-        {
-            type : 'value',
-            axisLabel : {
-                formatter: '{value}'
-            },
-            min: 0.72
-        }
+      {
+        type : 'value',
+        axisLabel : {
+          formatter: '{value}'
+        },
+        min: 0.72
+      }
     ],
     series : [
-        {
-            name:'SVD',
-            type:'line',
-            data:[0.735, 0.759, 0.766, 0.768, 0.770],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD++',
-            type:'line',
-            data:[0.729, 0.746, 0.751, 0.755, 0.755],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+ustar',
-            type:'line',
-            data:[0.762, 0.771, 0.775, 0.776, 0.777],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+bias',
-            type:'line',
-            data:[0.789, 0.794, 0.796, 0.797, 0.798],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
+      {
+        name:'SVD',
+        type:'line',
+        data:[0.735, 0.759, 0.766, 0.768, 0.770],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
         }
+      },
+      {
+        name:'SVD++',
+        type:'line',
+        data:[0.729, 0.746, 0.751, 0.755, 0.755],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+ustar',
+        type:'line',
+        data:[0.762, 0.771, 0.775, 0.776, 0.777],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+bias',
+        type:'line',
+        data:[0.789, 0.794, 0.796, 0.797, 0.798],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      }
     ]
-};
+  };
 
   f1_chart.setOption(option1);
 
@@ -102,85 +101,85 @@
 
   option2 = {
     title : {
-        text: 'MAE',
-        subtext: ''
+      text: 'MAE',
+      subtext: ''
     },
     tooltip : {
-        trigger: 'axis'
+      trigger: 'axis'
     },
     legend: {
-        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
+      data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
+      show : true,
+      feature : {
+        mark : {show: true},
+        dataView : {show: true, readOnly: false},
+        magicType : {show: true, type: ['line', 'bar']},
+        restore : {show: true},
+        saveAsImage : {show: true}
+      }
     },
     calculable : true,
     xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : ['1','2','3','4','5']
-        }
+      {
+        type : 'category',
+        boundaryGap : false,
+        data : ['1','2','3','4','5']
+      }
     ],
     yAxis : [
-        {
-            type : 'value',
-            axisLabel : {
-                formatter: '{value}'
-            },
-            min: 0.3
-        }
+      {
+        type : 'value',
+        axisLabel : {
+          formatter: '{value}'
+        },
+        min: 0.3
+      }
     ],
     series : [
-        {
-            name:'SVD',
-            type:'line',
-            data:[0.483, 0.424, 0.405, 0.402, 0.396],
-            markLine : {
-                data : [
-                    {type : 'average', name: '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD++',
-            type:'line',
-            data:[0.505, 0.471, 0.456, 0.446, 0.445],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+ustar',
-            type:'line',
-            data:[0.412, 0.393, 0.382, 0.382, 0.378],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+bias',
-            type:'line',
-            data:[0.344, 0.330, 0.325, 0.324, 0.321],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
+      {
+        name:'SVD',
+        type:'line',
+        data:[0.483, 0.424, 0.405, 0.402, 0.396],
+        markLine : {
+          data : [
+            {type : 'average', name: '平均值'}
+          ]
         }
+      },
+      {
+        name:'SVD++',
+        type:'line',
+        data:[0.505, 0.471, 0.456, 0.446, 0.445],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+ustar',
+        type:'line',
+        data:[0.412, 0.393, 0.382, 0.382, 0.378],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+bias',
+        type:'line',
+        data:[0.344, 0.330, 0.325, 0.324, 0.321],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      }
     ]
-};
+  };
 
   mae_chart.setOption(option2);
 
@@ -188,85 +187,85 @@
 
   option3 = {
     title : {
-        text: 'RMSE',
-        subtext: ''
+      text: 'RMSE',
+      subtext: ''
     },
     tooltip : {
-        trigger: 'axis'
+      trigger: 'axis'
     },
     legend: {
-        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
+      data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
+      show : true,
+      feature : {
+        mark : {show: true},
+        dataView : {show: true, readOnly: false},
+        magicType : {show: true, type: ['line', 'bar']},
+        restore : {show: true},
+        saveAsImage : {show: true}
+      }
     },
     calculable : true,
     xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : ['1','2','3','4','5']
-        }
+      {
+        type : 'category',
+        boundaryGap : false,
+        data : ['1','2','3','4','5']
+      }
     ],
     yAxis : [
-        {
-            type : 'value',
-            axisLabel : {
-                formatter: '{value}'
-            },
-            min: 0.8
-        }
+      {
+        type : 'value',
+        axisLabel : {
+          formatter: '{value}'
+        },
+        min: 0.8
+      }
     ],
     series : [
-        {
-            name:'SVD',
-            type:'line',
-            data:[1.095, 1.011, 0.981, 0.976, 0.968],
-            markLine : {
-                data : [
-                    {type : 'average', name: '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD++',
-            type:'line',
-            data:[1.135, 1.096, 1.073, 1.057, 1.057],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+ustar',
-            type:'line',
-            data:[0.985, 0.959, 0.942, 0.944, 0.938],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+bias',
-            type:'line',
-            data:[0.867, 0.842, 0.834, 0.832, 0.828],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
+      {
+        name:'SVD',
+        type:'line',
+        data:[1.095, 1.011, 0.981, 0.976, 0.968],
+        markLine : {
+          data : [
+            {type : 'average', name: '平均值'}
+          ]
         }
+      },
+      {
+        name:'SVD++',
+        type:'line',
+        data:[1.135, 1.096, 1.073, 1.057, 1.057],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+ustar',
+        type:'line',
+        data:[0.985, 0.959, 0.942, 0.944, 0.938],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+bias',
+        type:'line',
+        data:[0.867, 0.842, 0.834, 0.832, 0.828],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      }
     ]
-};
+  };
 
   rmse_chart.setOption(option3);
 
@@ -274,85 +273,85 @@
 
   option4 = {
     title : {
-        text: 'Business LFM Weight',
-        subtext: ''
+      text: 'Business LFM Weight',
+      subtext: ''
     },
     tooltip : {
-        trigger: 'axis'
+      trigger: 'axis'
     },
     legend: {
-        data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
+      data: ['SVD', 'SVD++', 'SVD+ustar', 'SVD+bias']
     },
     toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
+      show : true,
+      feature : {
+        mark : {show: true},
+        dataView : {show: true, readOnly: false},
+        magicType : {show: true, type: ['line', 'bar']},
+        restore : {show: true},
+        saveAsImage : {show: true}
+      }
     },
     calculable : true,
     xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : ['1','2','3','4','5']
-        }
+      {
+        type : 'category',
+        boundaryGap : false,
+        data : ['1','2','3','4','5']
+      }
     ],
     yAxis : [
-        {
-            type : 'value',
-            axisLabel : {
-                formatter: '{value} %'
-            },
-            min: 30.0
-        }
+      {
+        type : 'value',
+        axisLabel : {
+          formatter: '{value} %'
+        },
+        min: 30.0
+      }
     ],
     series : [
-        {
-            name:'SVD',
-            type:'line',
-            data:[36.4, 37.8, 36.0, 34.7, 34.7],
-            markLine : {
-                data : [
-                    {type : 'average', name: '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD++',
-            type:'line',
-            data:[47.9, 56.5, 50.5, 51.9, 54.6],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+ustar',
-            type:'line',
-            data:[43.2, 45.8, 44.6, 45.8, 43.5],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
-        },
-        {
-            name:'SVD+bias',
-            type:'line',
-            data:[40.9, 37.3, 36.1, 37.8, 35.1],
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
-            }
+      {
+        name:'SVD',
+        type:'line',
+        data:[36.4, 37.8, 36.0, 34.7, 34.7],
+        markLine : {
+          data : [
+            {type : 'average', name: '平均值'}
+          ]
         }
+      },
+      {
+        name:'SVD++',
+        type:'line',
+        data:[47.9, 56.5, 50.5, 51.9, 54.6],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+ustar',
+        type:'line',
+        data:[43.2, 45.8, 44.6, 45.8, 43.5],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      },
+      {
+        name:'SVD+bias',
+        type:'line',
+        data:[40.9, 37.3, 36.1, 37.8, 35.1],
+        markLine : {
+          data : [
+            {type : 'average', name : '平均值'}
+          ]
+        }
+      }
     ]
-};
+  };
 
   b_weight_chart.setOption(option4);
 

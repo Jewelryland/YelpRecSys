@@ -1,85 +1,85 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <html>
-  <head>
-    <script src="third-party/d3/d3.min.js"></script>
-    <script src="echarts.min.js"></script>
-  </head>
-  <body>
-    <div id="main" style="width: 960px;height:600px;"></div>
-    <script type="text/javascript">
+<head>
+  <script src="d3.min.js"></script>
+  <script src="echarts.min.js"></script>
+</head>
+<body>
+  <div id="main" style="width: 960px;height:600px;"></div>
+  <script type="text/javascript">
 
-	    d3.csv("feat_sim_mic_0.05.csv", function(error, matrix){
-		    var xy_axis = [];
-			for (var key in matrix[0]) {
-				xy_axis.push(key);
-			}
+  d3.csv("feat_sim_mic_0.05.csv", function(error, matrix){
+    var xy_axis = [];
+    for (var key in matrix[0]) {
+      xy_axis.push(key);
+    }
 
-			var data = [];
-			for (var row in matrix) {
-				var col = 0;
-				for (var key in matrix[row]) {
-					var blk = [parseInt(row), col, matrix[row][key]];
-					if (row >= col) {
-						data.push(blk);
-					}
-					col += 1;
-				}
-			}
+    var data = [];
+    for (var row in matrix) {
+      var col = 0;
+      for (var key in matrix[row]) {
+        var blk = [parseInt(row), col, matrix[row][key]];
+        if (row >= col) {
+          data.push(blk);
+        }
+        col += 1;
+      }
+    }
 
-			data = data.map(function (item) {
-    return [item[1], item[0], item[2] || '-'];
-});
+    data = data.map(function (item) {
+      return [item[1], item[0], item[2] || '-'];
+    });
 
-var myChart = echarts.init(document.getElementById('main'));
+    var myChart = echarts.init(document.getElementById('main'));
 
-option = {
-    tooltip: {
+    option = {
+      tooltip: {
         position: 'top'
-    },
-    animation: false,
-    grid: {
+      },
+      animation: false,
+      grid: {
         height: '60%',
         x: '15%',
         y: '10%'
-    },
-    xAxis: {
+      },
+      xAxis: {
         type: 'category',
         data: xy_axis
-    },
-    yAxis: {
+      },
+      yAxis: {
         type: 'category',
         data: xy_axis
-    },
-    visualMap: {
+      },
+      visualMap: {
         min: 0.2,
         max: 1,
         calculable: true,
         orient: 'horizontal',
         left: 'center',
         bottom: '20%'
-    },
-    series: [{
+      },
+      series: [{
         name: 'Punch Card',
         type: 'heatmap',
         data: data,
         label: {
-            normal: {
-                show: true
-            }
+          normal: {
+            show: true
+          }
         },
         itemStyle: {
-            emphasis: {
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-            }
+          emphasis: {
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
         }
-    }]
-};
+      }]
+    };
 
-myChart.setOption(option);
-	    });
+    myChart.setOption(option);
+  });
 
-    </script>
-  </body>
+  </script>
+</body>
 </html>

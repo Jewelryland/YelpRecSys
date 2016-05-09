@@ -2,7 +2,6 @@
 <meta charset="utf-8">
 <html>
 <head>
-  <script src="third-party/d3/d3.min.js"></script>
   <script src="echarts.min.js"></script>
 </head>
 <body>
@@ -10,62 +9,62 @@
   <script type="text/javascript">
 
   var myChart = echarts.init(document.getElementById('main'));
-
+  
   option = {
     title : {
-        text: 'SVD Performances'
+      text: 'SVD Performances'
     },
     tooltip : {
-        trigger: 'axis'
+      trigger: 'axis'
     },
     legend: {
-        data:['SVD RMSE','SVD++ RMSE','SVD MAE','SVD++ MAE']
+      data:['SVD RMSE','SVD++ RMSE','SVD MAE','SVD++ MAE']
     },
     calculable : true,
     xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : ['1','2','3','4','5']
-        }
+      {
+        type : 'category',
+        boundaryGap : false,
+        data : ['1','2','3','4','5']
+      }
     ],
     yAxis : [
-        {
-            type : 'value',
-            min : 0.9
-        }
+      {
+        type : 'value',
+        min : 0.9
+      }
     ],
     series : [
-        {
-            name:'SVD RMSE',
-            type:'line',
-            smooth:true,
-            itemStyle: {},
-            data:[1.73294, 1.73307, 1.73311, 1.73278, 1.73244]
-        },
-        {
-            name:'SVD++ RMSE',
-            type:'line',
-            smooth:true,
-            itemStyle: {},
-            data:[1.33474, 1.33480, 1.33477, 1.33484, 1.33482]
-        },
-        {
-            name:'SVD MAE',
-            type:'line',
-            smooth:true,
-            itemStyle: {},
-            data:[1.18647, 1.18662, 1.18662, 1.18621, 1.18582]
-        },
-        {
-            name:'SVD++ MAE',
-            type:'line',
-            smooth:true,
-            itemStyle: {},
-            data:[0.94120, 0.94127, 0.94126, 0.94130, 0.94122]
-        }
+      {
+        name:'SVD RMSE',
+        type:'line',
+        smooth:true,
+        itemStyle: {},
+        data:[1.73294, 1.73307, 1.73311, 1.73278, 1.73244]
+      },
+      {
+        name:'SVD++ RMSE',
+        type:'line',
+        smooth:true,
+        itemStyle: {},
+        data:[1.33474, 1.33480, 1.33477, 1.33484, 1.33482]
+      },
+      {
+        name:'SVD MAE',
+        type:'line',
+        smooth:true,
+        itemStyle: {},
+        data:[1.18647, 1.18662, 1.18662, 1.18621, 1.18582]
+      },
+      {
+        name:'SVD++ MAE',
+        type:'line',
+        smooth:true,
+        itemStyle: {},
+        data:[0.94120, 0.94127, 0.94126, 0.94130, 0.94122]
+      }
     ]
-};
+  };
 
 
   myChart.setOption(option);
