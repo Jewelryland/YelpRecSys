@@ -22,15 +22,16 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
 from sklearn.decomposition import PCA
-from feature_reformer import FeatureReformer, over_sampling
-from recsys_cbf_2stage import RecScorer
-from recsys_cf_naive_svd import NaiveSVD
-from recsys_cf_svdpp import SVDPlusPlus
+from .feature_reformer import FeatureReformer, over_sampling
+from .recsys_cbf_2stage import RecScorer
+from .recsys_cf_naive_svd import NaiveSVD
+from .recsys_cf_svdpp import SVDPlusPlus
 
 
 # Constant values
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
 DB_PATH = os.path.join(DATA_PATH, 'yelp.sqlite')
+CODE_PATH = os.path.join(os.path.dirname(__file__))
 
 
 # Loading samples from the database & pre-scale
@@ -43,10 +44,10 @@ def load_samples(oversampling=(0, 0), core=False, n_comp=1):
     t = time()
     with sqlite3.connect(DB_PATH) as conn:
         # execute the script 'update_view' first if necessary
-        # svd = NaiveSVD(n_components=5)
-        # svd.fit(np.load('r_matrix.npy')[()].tocsr())
-        # svdpp = SVDPlusPlus(n_components=2, max_iter=2, tol=0.0001)
-        # svdpp.fit(np.load('r_matrix.npy')[()].tocsr(), verbose=False)
+        svd = NaiveSVD(n_components=n_comp)
+        svd.fit(np.load(os.path.join(CODE_PATH, 'r_matrix.npy'))[()].tocsr())
+        # svdpp = SVDPlusPlus(n_components=n_comp, max_iter=2, tol=0.1)
+        # svdpp.fit(np.load(os.path.join(CODE_PATH, 'r_matrix.npy'))[()].tocsr(), verbose=False, warm_start=True)
 
         if core:
             basic_features = FeatureReformer(conn, 'r_samples',
@@ -56,13 +57,13 @@ def load_samples(oversampling=(0, 0), core=False, n_comp=1):
                 'rstar',
                 'brcnt',
                 'bstar',
-                'checkins',
-                'compliments',
-                'fans',
+                # 'checkins',
+                # 'compliments',
+                # 'fans',
                 'rdate',
-                'urcnt',
+                # 'urcnt',
                 'ustar',
-                'uvotes',
+                # 'uvotes',
                 'ysince',
                 ]).transform()
         X = np.column_stack((
@@ -70,22 +71,30 @@ def load_samples(oversampling=(0, 0), core=False, n_comp=1):
             # Imputer(strategy='mean', axis=0).fit_transform(
             #     FeatureReformer(conn, 'r_samples', [
             #         'avg_star_elite',
-            #         'avg_star_nonelite',
+            #         # 'avg_star_nonelite',
             #     ]).transform(),
             # ),
+            # FeatureReformer(conn, 'r_samples', ['user_state']).transform('state'),
             # FeatureReformer(conn, 'r_samples', ['bstate']).transform('state'),
-            FeatureReformer(conn, 'r_samples', ['cas']).transform('vector', n_components=n_comp),
+            # FeatureReformer(conn, 'r_samples', ['cas']).transform('vector', n_components=n_comp),
             # FeatureReformer(conn, 'r_samples', ['tastes']).transform('vector', n_components=n_comp, impute=True),
             # svdpp.gen_latent_feature_space(),
+            # svd.gen_latent_feature_space(),
         ))
 
         # oversampling
-        ovsp = []
-        for i in range(X.shape[0]):
-            if oversampling[0] <= X[i, 0] <= oversampling[1]:
-                ovsp.append(i)
-        ovsp = np.array(list(range(X.shape[0])) + ovsp)
-        X = X[ovsp]
+        # if True:  # not core:
+        #     ovsp = []
+        #     for i in range(X.shape[0]):
+        #         if oversampling[0] <= X[i, 0] <= oversampling[1]:
+        #             ovsp.append(i)
+        #     ovsp = np.array(list(range(X.shape[0])) + ovsp)
+        #     X = X[ovsp]
+
+        leng = X.shape[0]
+        aleng = np.arange(leng)
+        # X = X[np.append(aleng, aleng)]
+        X = X[np.append(np.append(aleng, aleng), aleng)]
 
         # extract target(y)
         y = X[:, 0]
@@ -152,29 +161,35 @@ if __name__ == '__main__':
         'lr': LinearRegression(normalize=False),
         'gbdt': GradientBoostingClassifier(n_estimators=5)
     }
-    model_dict.setdefault('erf', ExtraTreesClassifier(n_estimators=5))
+    model_dict.setdefault('erf', ExtraTreesClassifier(n_estimators=3))
     model = model_dict[model_type]
 
-    samples, targets, n_samples, n_features = load_samples(oversampling=(1, 4), core=True, n_comp=1)
+    samples, targets, n_samples, n_features = load_samples(oversampling=(1, 4), core=False, n_comp=1)
     div = ShuffleSplit(n_samples, n_iter=n_iter_num, test_size=0.2, random_state=0)
     train_and_predict(samples, targets, div, model, n_features)
+
+    # for k in range(11, 0, -1):
+    #     selector = SelectKBest(f_classif, k=k)
+    #     selector.fit(samples, targets)
+    #     print(selector.get_support(indices=True))
+
+
     # for key in model_dict:
     #     print('\n', key)
     #     model = model_dict[key]
     #     train_and_predict(samples, targets, div, model, n_features)
 
-    '''
-    f1s, maes, rmses = [], [], []
-    for k in range(34, 1, -1):
-        t = time()
-        samples = SelectKBest(f_classif, k=k).fit_transform(samples, targets)
-        print('Finished Select', str(k), 'Best Features Using', time()-t, 's')
-        n_features = samples.shape[1]
-        sc = train_and_predict(samples, targets, div, model, n_features)
-        f1s.append(sc['f1'])
-        maes.append(sc['mae'])
-        rmses.append(sc['rmse'])
-    print(f1s)
-    print(maes)
-    print(rmses)
-    '''
+
+    # f1s, maes, rmses = [], [], []
+    # for k in range(11, 0, -1):
+    #     t = time()
+    #     samples = SelectKBest(f_classif, k=k).fit_transform(samples, targets)
+    #     print('Finished Select', str(k), 'Best Features Using', time()-t, 's')
+    #     n_features = samples.shape[1]
+    #     sc = train_and_predict(samples, targets, div, model, n_features)
+    #     f1s.append(sc['f1'])
+    #     maes.append(sc['mae'])
+    #     rmses.append(sc['rmse'])
+    # print(f1s)
+    # print(maes)
+    # print(rmses)

@@ -203,5 +203,5 @@ class SVDPlusPlus(object):
 if __name__ == '__main__':
     R_train = np.load(os.path.join(CODE_PATH, 'r_matrix_train.npy'))[()]
     R_test = np.load(os.path.join(CODE_PATH, 'r_matrix_test.npy'))[()]
-    svdpp = SVDPlusPlus(n_components=1, max_iter=1, tol=0.1)
+    svdpp = SVDPlusPlus(n_components=5, max_iter=1, tol=0.1)
     svdpp.fit(R_train, R_test, verbose=True, warm_start=False)

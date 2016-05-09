@@ -103,8 +103,9 @@ def gen_sparse_rate_matrix(train, *test):
 
 
 class NaiveSVD(object):
-    def __init__(self, n_components=2, random_state=None):
-        self.svd = TruncatedSVD(n_components=n_components, random_state=random_state)
+    def __init__(self, n_components=2, max_iter=5, random_state=None):
+        self.svd = TruncatedSVD(n_components=n_components,
+                                n_iter=max_iter, random_state=random_state)
         self.U = None
         self.B = None
         self.nonzero_n_train = 0
@@ -125,7 +126,8 @@ class NaiveSVD(object):
                 r = 5
         return r
 
-    def fit(self, R_train, R_test=None):
+    def fit(self, R_train, R_test=None, verbose=False):
+        t = time()
         if sp.issparse(R_train) and R_train.getformat() not in ["csr"]:
             R_train = R_train.tocsr()
         self.nonzero_n_train = R_train.data.shape[0]
@@ -156,6 +158,8 @@ class NaiveSVD(object):
         self.svd.fit(R_train)
         self.B = self.svd.components_
         self.U = self.svd.transform(R_train)  # numpy.ndarray
+
+        print('End training using SVD after', time()-t, 's') if verbose else None
 
         # predicting
         if R_test is None:
@@ -217,8 +221,5 @@ if __name__ == '__main__':
     R_train = np.load(os.path.join(CODE_PATH, 'r_matrix_train.npy'))[()].tocsr()
     R_test = np.load(os.path.join(CODE_PATH, 'r_matrix_test.npy'))[()]  # coo_matrix
 
-    for n_comp in range(1, 2):
-        t = time()
-        svd = NaiveSVD(n_components=5)
-        svd.fit(R_train, R_test)
-        print('End training using SVD after', time()-t, 's')
+    svd = NaiveSVD(n_components=5, max_iter=1)
+    svd.fit(R_train, R_test, verbose=True)

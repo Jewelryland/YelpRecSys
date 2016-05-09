@@ -18,7 +18,7 @@ from sklearn.cross_validation import StratifiedKFold, ShuffleSplit
 from sklearn.metrics import *
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.decomposition import PCA
-from feature_reformer import FeatureReformer, over_sampling
+from .feature_reformer import FeatureReformer, over_sampling
 
 # Constant values
 DATA_PATH = '/Users/Adward/OneDrive/YelpData/'
@@ -26,7 +26,7 @@ DB_PATH = os.path.join(DATA_PATH, 'yelp.sqlite')
 
 
 class RecScorer(object):
-    def __init__(self, n_class=5, is_clsf = True):
+    def __init__(self, n_class=5, is_clsf=True):
         self.n_class = n_class
         self.round_cnt = n_class
         self.scores = {'f1_by_star': [[] for i in range(n_class)],
@@ -82,13 +82,13 @@ def two_stage_rbf(oversampling=(0, 0)):
             FeatureReformer(conn, 'r_samples', [
                 'brcnt',
                 'bstar',
-                'checkins',
-                'compliments',
-                'fans',
+                # 'checkins',
+                # 'compliments',
+                # 'fans',
                 'rdate',
-                'urcnt',
+                # 'urcnt',
                 'ustar',
-                'uvotes',
+                # 'uvotes',
                 'ysince',
                 ]).transform(),
             # FeatureReformer(conn, 'r_samples', ['bstate']).transform('state'),
@@ -101,6 +101,7 @@ def two_stage_rbf(oversampling=(0, 0)):
     #     if oversampling[0] <= y5[i] <= oversampling[1]:
     #         ovsp.append(i)
     # ovsp = np.array(list(range(len(y5))) + ovsp)
+    ovsp = np.append(ovsp, np.arange(len(y5)))
     X = X[ovsp]
     y2 = y2[ovsp]
     y5 = y5[ovsp]
@@ -209,5 +210,5 @@ def binary_cbf(oversampling=(0, 0)):
 
 if __name__ == '__main__':
     # n_iter_num = int(sys.argv[1])
-    two_stage_rbf(oversampling=(3, 5))
+    two_stage_rbf(oversampling=(1, 5))
     # binary_cbf(oversampling=(4, 5))
