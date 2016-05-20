@@ -20,7 +20,7 @@ from sklearn.cross_validation import StratifiedKFold, ShuffleSplit
 from sklearn.metrics import *
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier, ExtraTreesRegressor
 from sklearn.decomposition import PCA
 from .feature_reformer import FeatureReformer, over_sampling
 from .recsys_cbf_2stage import RecScorer
@@ -110,7 +110,7 @@ def train_and_predict(X, y, div, model, n_features):
     # input()
     # scores = cross_validation.cross_val_score(clf, data, target, cv=2, scoring='f1_weighted')
     t = time()
-    rec_scorer = RecScorer(n_class=5)
+    rec_scorer = RecScorer(n_class=5, is_clsf=False)
     if type(model).__name__ in ['LinearRegression']:
         rec_scorer = RecScorer(is_clsf=False)
     feature_weights = np.zeros(n_features)
@@ -159,7 +159,8 @@ if __name__ == '__main__':
     model_dict = {
         'rf': RandomForestClassifier(n_estimators=5),  # max_features='auto'; int(math.sqrt(n_features)))
         'lr': LinearRegression(normalize=False),
-        'gbdt': GradientBoostingClassifier(n_estimators=5)
+        'gbdt': GradientBoostingClassifier(n_estimators=5),
+        'erfr': ExtraTreesRegressor(n_estimators=5)
     }
     model_dict.setdefault('erf', ExtraTreesClassifier(n_estimators=3))
     model = model_dict[model_type]
